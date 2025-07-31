@@ -1,13 +1,18 @@
 const express = require('express');
 const sequelize = require('./config/database');
-const authRoutes = require('./routes/auth');
-const User = require('./models/User');
 const path = require('path');
 const fs = require('fs');
 
+// Import your models and routes
+const User = require('./models/User');
+const college = require('./models/College'); // <-- Corrected: Use uppercase for the model class
+const authRoutes = require('./routes/auth');
+const collegeRoutes = require('./routes/collegeRoutes'); // <-- Corrected: Use plural name to match convention
+
 const app = express();
 
-// Middleware
+// --- CRITICAL FIX: Place body-parsing middleware at the top ---
+// Middleware to parse incoming request bodies (JSON and URL-encoded)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -20,8 +25,10 @@ if (!fs.existsSync(uploadsDir)) {
 // Serve static files
 app.use('/uploads', express.static(uploadsDir));
 
+// --- Route mounting after middleware ---
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/colleges', collegeRoutes); // <-- Corrected: Mount the college routes just once
 
 // Basic route for testing
 app.get('/', (req, res) => {
@@ -35,7 +42,8 @@ app.use((err, req, res, next) => {
 });
 
 // Database sync and server start
-sequelize.sync()
+// IMPORTANT: Use { alter: true } for development
+sequelize.sync({ alter: true })
   .then(() => {
     console.log('✅ DB synced');
     app.listen(3000, () => {
