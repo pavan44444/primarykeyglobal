@@ -5,8 +5,14 @@ const User = require('../models/User');
 // Register User
 const registerUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    // 1. Destructure all required fields from the request body
+    const { name, email, password, college, city, role } = req.body;
     const image = req.file ? req.file.filename : null;
+
+    // 2. Add validation for the fields required by your model
+    if (!name || !email || !password || !college || !city || !role) {
+      return res.status(400).json({ message: 'All fields (name, email, password, college, city, role) are required.' });
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
@@ -17,17 +23,24 @@ const registerUser = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Create user with all the required fields
     const user = await User.create({
-      username,
+      name, // Changed from `username` to `name` to match your model
       email,
       password: hashedPassword,
-      image
+      image,
+      college, // Added this field
+      city,    // Added this field
+      role
     });
 
     res.status(201).json({ 
       message: 'User registered successfully',
-      user: { id: user.id, username: user.username, email: user.email }
+      user: { 
+        id: user.id, 
+        name: user.name, // Changed from `username` to `name`
+        email: user.email 
+      }
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -58,9 +71,10 @@ const loginUser = async (req, res) => {
     }
 
     // Create JWT token
+    // It's a good practice to store the JWT secret in a .env file.
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || 'your-secret-key', // Use environment variable
+      process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '24h' }
     );
 
@@ -69,7 +83,7 @@ const loginUser = async (req, res) => {
       token,
       user: {
         id: user.id,
-        username: user.username,
+        name: user.name, // Changed from `username` to `name`
         email: user.email,
         image: user.image
       }
