@@ -17,4 +17,3 @@ router.get('/', interviewExperienceController.getAllExperiences);
 router.get('/my-college', interviewExperienceController.getExperiencesByMyCollege);
 
 module.exports = router;
-

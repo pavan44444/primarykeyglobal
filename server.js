@@ -2,30 +2,40 @@ const express = require('express');
 const sequelize = require('./config/database');
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors'); // --- Import CORS package ---
 
 // --- Import Models ---
-// It's good practice to import all models here so Sequelize is aware of them.
 const User = require('./models/User');
 const College = require('./models/College');
 const InterviewExperience = require('./models/InterviewExperience');
-//const Quiz = require('./models/Quiz'); // New: Quiz model
-//const Question = require('./models/Question'); // New: Question model
-const Company = require('./models/Company'); // New: Company model
+//const Quiz = require('./models/Quiz');
+//const Question = require('./models/Question');
+ const Company = require('./models/Company');
 
 // --- Import Routes ---
-// Group all your route files together for clarity.
 const authRoutes = require('./routes/auth');
 const collegeRoutes = require('./routes/collegeRoutes');
 const interviewExperienceRoutes = require('./routes/interviewExperienceRoutes');
-const companyRoutes = require('./routes/companyRoutes');
+ const companyRoutes = require('./routes/companyRoutes');
 //const quizRoutes = require('./routes/quizRoutes');
 
 const app = express();
 
 // --- Middleware ---
-// CRITICAL: Body-parsing middleware must come first.
+// CRITICAL: Body-parsing and CORS middleware must come first.
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors()); // --- Use CORS middleware here ---
+
+// You can also configure CORS for specific origins if needed.
+// For example, to allow requests only from http://localhost:5173:
+/*
+const corsOptions = {
+  origin: 'http://localhost:5173', // Replace with your front-end URL
+  optionsSuccessStatus: 200 // For legacy browser support
+};
+app.use(cors(corsOptions));
+*/
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -37,7 +47,6 @@ if (!fs.existsSync(uploadsDir)) {
 app.use('/uploads', express.static(uploadsDir));
 
 // --- Route Mounting ---
-// Group all your route endpoints together.
 app.use('/api/auth', authRoutes);
 app.use('/api/colleges', collegeRoutes);
 app.use('/api/experiences', interviewExperienceRoutes);
@@ -56,7 +65,7 @@ app.use((err, req, res, next) => {
 });
 
 // Database sync and server start
-sequelize.sync({ alter: true })
+sequelize.sync({ alter: false})
   .then(() => {
     console.log('✅ DB synced');
     app.listen(3000, () => {
