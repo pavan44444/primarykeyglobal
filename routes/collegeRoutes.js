@@ -1,20 +1,33 @@
 const express = require('express');
-const multer = require('multer');
-const { registerUser, loginUser } = require('../controllers/authController');
+const { 
+  addCollege, 
+  deleteCollege, 
+  getAllColleges, 
+  getUserCollege 
+} = require('../controllers/collegeController');
+
+// Import middleware
+const checkAuth = require('../middleware/checkAuth');
+const checkAdmin = require('../middleware/checkAdmin');
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-  destination: './uploads',
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
-});
+// --- ADMIN ROUTES (Protected) ---
+// Add a new college (Admin only)
+router.post('/admin/add', checkAuth, checkAdmin, addCollege);
 
-const upload = multer({ storage });
+// Delete a college (Admin only)
+router.delete('/admin/:id', checkAuth, checkAdmin, deleteCollege);
 
-// Registration route with image upload
-router.post('/register', upload.single('image'), registerUser);
+// Get all colleges (Admin only)
+router.get('/admin/all', checkAuth, checkAdmin, getAllColleges);
 
-// Login route (no file upload needed for login)
-router.post('/login', loginUser);
+// --- USER ROUTES (Protected) ---
+// Get user's college
+router.get('/my-college', checkAuth, getUserCollege);
+
+// --- PUBLIC ROUTES (Optional) ---
+// You might want to allow users to see all colleges when registering
+// router.get('/all', getAllColleges);
 
 module.exports = router;

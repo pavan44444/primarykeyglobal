@@ -3,16 +3,27 @@ const sequelize = require('./config/database');
 const path = require('path');
 const fs = require('fs');
 
-// Import your models and routes
+// --- Import Models ---
+// It's good practice to import all models here so Sequelize is aware of them.
 const User = require('./models/User');
-const college = require('./models/College'); // <-- Corrected: Use uppercase for the model class
+const College = require('./models/College');
+const InterviewExperience = require('./models/InterviewExperience');
+//const Quiz = require('./models/Quiz'); // New: Quiz model
+//const Question = require('./models/Question'); // New: Question model
+const Company = require('./models/Company'); // New: Company model
+
+// --- Import Routes ---
+// Group all your route files together for clarity.
 const authRoutes = require('./routes/auth');
-const collegeRoutes = require('./routes/collegeRoutes'); // <-- Corrected: Use plural name to match convention
+const collegeRoutes = require('./routes/collegeRoutes');
+const interviewExperienceRoutes = require('./routes/interviewExperienceRoutes');
+const companyRoutes = require('./routes/companyRoutes');
+//const quizRoutes = require('./routes/quizRoutes');
 
 const app = express();
 
-// --- CRITICAL FIX: Place body-parsing middleware at the top ---
-// Middleware to parse incoming request bodies (JSON and URL-encoded)
+// --- Middleware ---
+// CRITICAL: Body-parsing middleware must come first.
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -25,10 +36,13 @@ if (!fs.existsSync(uploadsDir)) {
 // Serve static files
 app.use('/uploads', express.static(uploadsDir));
 
-// --- Route mounting after middleware ---
-// Routes
+// --- Route Mounting ---
+// Group all your route endpoints together.
 app.use('/api/auth', authRoutes);
-app.use('/api/colleges', collegeRoutes); // <-- Corrected: Mount the college routes just once
+app.use('/api/colleges', collegeRoutes);
+app.use('/api/experiences', interviewExperienceRoutes);
+app.use('/api/companies', companyRoutes);
+//app.use('/api/quizzes', quizRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {
@@ -42,7 +56,6 @@ app.use((err, req, res, next) => {
 });
 
 // Database sync and server start
-// IMPORTANT: Use { alter: true } for development
 sequelize.sync({ alter: true })
   .then(() => {
     console.log('✅ DB synced');
