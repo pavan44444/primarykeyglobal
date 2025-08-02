@@ -13,7 +13,7 @@ const College = sequelize.define('College', {
   // Name of the college (e.g., "Indian Institute of Technology Bombay")
   name: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
     unique: true, // College names should be unique to prevent duplicates
   },
 
