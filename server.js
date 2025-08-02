@@ -11,12 +11,15 @@ const InterviewExperience = require('./models/InterviewExperience');
 //const Quiz = require('./models/Quiz');
 //const Question = require('./models/Question');
  const Company = require('./models/Company');
+ 
 
 // --- Import Routes ---
 const authRoutes = require('./routes/auth');
 const collegeRoutes = require('./routes/collegeRoutes');
 const interviewExperienceRoutes = require('./routes/interviewExperienceRoutes');
  const companyRoutes = require('./routes/companyRoutes');
+ 
+const visitRoutes = require('./routes/visitRoutes'); 
 //const quizRoutes = require('./routes/quizRoutes');
 
 const app = express();

@@ -259,12 +259,28 @@
             // Function to fetch and display experiences
             async function fetchExperiences() {
                 try {
-                    const response = await fetch('http://localhost:3000/api/experiences');
-                    
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
+                   const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken'); // or however you store the token
+                   console.log(localStorage);
+if (!token) {
+    experiencesList.innerHTML = '<div class="error">Please login to view experiences.</div>';
+    return;
+}
 
+const response = await fetch('http://localhost:3000/api/experiences/my-college', {
+    method: 'GET',
+    headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    }
+}); 
+                   if (!response.ok) {
+    if (response.status === 401) {
+        localStorage.removeItem('authToken'); // Clear invalid token
+        experiencesList.innerHTML = '<div class="error">Session expired. Please login again.</div>';
+        return;
+    }
+    throw new Error('Network response was not ok');
+}
                     const experiences = await response.json();
                     
                     if (experiences.length === 0) {
@@ -293,13 +309,20 @@
                             `;
                         }
                         
-                        experienceCard.innerHTML = `
-                            <h2 class="company-title">${exp.company}</h2>
-                            <p class="meta-info">Passout Year: ${exp.passoutYear} | Rounds: ${exp.rounds}</p>
-                            <p class="description">${exp.description}</p>
-                            ${roundsHtml}
-                        `;
-                        experiencesList.appendChild(experienceCard);
+                       experienceCard.innerHTML = `
+    <h2 class="company-title">${exp.company}</h2>
+    <p class="meta-info">Passout Year: ${exp.passoutYear} | Rounds: ${exp.rounds}</p>
+    <p class="description">${exp.description}</p>
+    ${roundsHtml}
+`;
+
+// Make the card clickable
+experienceCard.style.cursor = 'pointer';
+experienceCard.addEventListener('click', () => {
+    window.location.href = `experience-detail.html?id=${exp._id}`;
+});
+
+experiencesList.appendChild(experienceCard);
                     });
 
                 } catch (error) {

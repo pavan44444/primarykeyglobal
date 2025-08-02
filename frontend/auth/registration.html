@@ -574,10 +574,12 @@
                     const data = await response.json();
 
                     if (response.ok) {
-                        window.location.href = "../dashboard/dashboard.html";
-                        // Handle successful login (redirect, store token, etc.)
-                        console.log('Login successful:', data);
-                    } else {
+    // Store the token in localStorage
+    localStorage.setItem('authToken', data.token);
+    
+    window.location.href = "../dashboard/dashboard.html";
+    console.log('Login successful:', data);
+} else {
                         this.showMessage(data.message || 'Login failed', 'error');
                     }
                 } catch (error) {
