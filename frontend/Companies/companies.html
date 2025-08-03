@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Companies Visited</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0f23, #0d47a1);
+      color: #fff;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      background-color: rgba(0, 0, 0, 0.3);
+      font-size: 2em;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .company-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      padding: 40px;
+    }
+
+    .company-card {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .company-card:hover {
+      transform: scale(1.05);
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .company-logo {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      margin-bottom: 15px;
+    }
+
+    .company-name {
+      font-size: 1.2em;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .job-role, .package {
+      font-size: 0.95em;
+      margin-bottom: 6px;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <header>🏢 Companies Visited</header>
+
+  <section class="company-container">
+    <div class="company-card">
+      <img src="https://logo.clearbit.com/google.com" alt="Google" class="company-logo" />
+      <div class="company-name">Google</div>
+      <div class="job-role">Software Engineer</div>
+      <div class="package">Package: ₹45 LPA</div>
+    </div>
+
+    <div class="company-card">
+      <img src="https://logo.clearbit.com/microsoft.com" alt="Microsoft" class="company-logo" />
+      <div class="company-name">Microsoft</div>
+      <div class="job-role">Product Manager</div>
+      <div class="package">Package: ₹42 LPA</div>
+    </div>
+
+    <div class="company-card">
+      <img src="https://logo.clearbit.com/amazon.com" alt="Amazon" class="company-logo" />
+      <div class="company-name">Amazon</div>
+      <div class="job-role">SDE I</div>
+      <div class="package">Package: ₹32 LPA</div>
+    </div>
+
+    <div class="company-card">
+      <img src="https://logo.clearbit.com/infosys.com" alt="Infosys" class="company-logo" />
+      <div class="company-name">Infosys</div>
+      <div class="job-role">System Engineer</div>
+      <div class="package">Package: ₹4 LPA</div>
+    </div>
+
+    <div class="company-card">
+      <img src="https://logo.clearbit.com/accenture.com" alt="Accenture" class="company-logo" />
+      <div class="company-name">Accenture</div>
+      <div class="job-role">ASE</div>
+      <div class="package">Package: ₹4.5 LPA</div>
+    </div>
+
+    <div class="company-card">
+      <img src="https://logo.clearbit.com/wipro.com" alt="Wipro" class="company-logo" />
+      <div class="company-name">Wipro</div>
+      <div class="job-role">Project Engineer</div>
+      <div class="package">Package: ₹3.6 LPA</div>
+    </div>
+  </section>
+
+</body>
+</html>

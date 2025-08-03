@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leaderboard - PrimaryKey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0f0f23;
+      --card: #1a1a2e;
+      --accent: #ffd700;
+      --text: #fff;
+      --muted: rgba(255,255,255,0.6);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      text-align: center;
+      font-size: 1.2rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .college-select {
+      display: block;
+      margin: 0 auto 2rem;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .leaderboard {
+      max-width: 800px;
+      margin: 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .entry {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--card);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: background 0.3s;
+    }
+
+    .entry:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .rank {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      width: 40px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex: 1;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #444;
+      object-fit: cover;
+    }
+
+    .name {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .college {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .coins {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .coins::after {
+      content: ' 🪙';
+    }
+
+    @media(max-width: 600px) {
+      .entry {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .coins {
+        align-self: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🏆 Leaderboard</h1>
+  <p class="subtitle">Be the <strong>Primary Key</strong> of your college. Earn coins. Climb ranks. Make impact.</p>
+
+  <select class="college-select" id="collegeSelect">
+    <option value="all">All Colleges</option>
+    <option value="MIT">MIT</option>
+    <option value="IIT Bombay">IIT Bombay</option>
+    <option value="NIT Trichy">NIT Trichy</option>
+    <option value="BITS Pilani">BITS Pilani</option>
+    <!-- Add more as needed -->
+  </select>
+
+  <div class="leaderboard" id="leaderboardList">
+    <!-- JS will inject users here -->
+  </div>
+
+  <script>
+    const users = [
+      { name: "Ananya Singh", college: "MIT", coins: 950, avatar: "https://i.pravatar.cc/48?img=5" },
+      { name: "Rohan Mehta", college: "IIT Bombay", coins: 900, avatar: "https://i.pravatar.cc/48?img=11" },
+      { name: "Priya Das", college: "MIT", coins: 880, avatar: "https://i.pravatar.cc/48?img=21" },
+      { name: "Dev Patel", college: "NIT Trichy", coins: 850, avatar: "https://i.pravatar.cc/48?img=33" },
+      { name: "Kiran Rao", college: "BITS Pilani", coins: 820, avatar: "https://i.pravatar.cc/48?img=36" },
+      { name: "Suresh Naik", college: "MIT", coins: 790, avatar: "https://i.pravatar.cc/48?img=44" },
+    ];
+
+    const leaderboardList = document.getElementById("leaderboardList");
+    const collegeSelect = document.getElementById("collegeSelect");
+
+    function renderLeaderboard(collegeFilter = "all") {
+      leaderboardList.innerHTML = "";
+
+      const filtered = users
+        .filter(u => collegeFilter === "all" || u.college === collegeFilter)
+        .sort((a, b) => b.coins - a.coins);
+
+      filtered.forEach((user, index) => {
+        const entry = document.createElement("div");
+        entry.className = "entry";
+        entry.innerHTML = `
+          <div class="rank">#${index + 1}</div>
+          <div class="user-info">
+            <img src="${user.avatar}" class="avatar" alt="avatar" />
+            <div>
+              <div class="name">${user.name}</div>
+              <div class="college">${user.college}</div>
+            </div>
+          </div>
+          <div class="coins">${user.coins}</div>
+        `;
+        leaderboardList.appendChild(entry);
+      });
+    }
+
+    collegeSelect.addEventListener("change", () => {
+      renderLeaderboard(collegeSelect.value);
+    });
+
+    renderLeaderboard();
+  </script>
+
+</body>
+</html>
