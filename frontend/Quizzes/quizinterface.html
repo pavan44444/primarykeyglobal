@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Creative Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0f23, #1a1a40);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .quiz-container {
+      max-width: 800px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .quiz-title {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #00ffe0;
+    }
+
+    .question-card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .question {
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+    }
+
+    .options li {
+      margin-bottom: 10px;
+      padding: 10px;
+      background: rgba(0, 255, 255, 0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .options li:hover {
+      background: rgba(0, 255, 255, 0.3);
+    }
+
+    .selected {
+      background: rgba(0, 255, 255, 0.5) !important;
+      font-weight: bold;
+    }
+
+    .quiz-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #00ffe0;
+      color: #000;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #00e6c2;
+    }
+
+    .quiz-stats {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .quiz-complete {
+      display: none;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .quiz-complete.show {
+      display: block;
+    }
+
+    .progress-bar-container {
+      background: #333;
+      height: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: #00ffe0;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <div class="quiz-title">🔥 Coding Mastery Quiz 🔑</div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+      <div class="question" id="questionText">Question goes here</div>
+      <ul class="options" id="optionsList"></ul>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn" onclick="nextQuestion()">Next</button>
+      <button class="btn" onclick="submitQuiz()">Submit</button>
+    </div>
+
+    <div class="quiz-stats" id="quizStats">
+      <p>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">5</span></p>
+      <p>Score: <span id="score">0</span></p>
+      <p>Time Remaining: <span id="timer">60</span> sec</p>
+    </div>
+
+    <div class="quiz-complete" id="quizComplete">
+      <h2>🎉 Quiz Completed!</h2>
+      <p>Your Score: <span id="finalScore"></span></p>
+      <p>Time Taken: <span id="timeTaken"></span></p>
+      <button class="btn" onclick="retakeQuiz()">Retake Quiz</button>
+      <button class="btn" onclick="viewResults()">View Detailed Results</button>
+    </div>
+  </div>
+
+  <script>
+    const quizData = {
+      questions: [
+        {
+          question: "Which language is used for styling web pages?",
+          options: ["HTML", "JQuery", "CSS", "XML"],
+          correct: 2
+        },
+        {
+          question: "Which is not a JavaScript Framework?",
+          options: ["Python Script", "JQuery", "Django", "NodeJS"],
+          correct: 2
+        },
+        {
+          question: "Which is used for Connect To Database?",
+          options: ["PHP", "HTML", "JS", "All"],
+          correct: 0
+        },
+        {
+          question: "What does API stand for?",
+          options: ["Application Programming Interface", "Advanced Programming Instruction", "Application Process Interface", "Application Programming Index"],
+          correct: 0
+        },
+        {
+          question: "Which one is a backend language?",
+          options: ["CSS", "Node.js", "HTML", "Bootstrap"],
+          correct: 1
+        }
+      ],
+      timeLimit: 60
+    };
+
+    let currentQuestionIndex = 0;
+    let selectedAnswers = new Array(quizData.questions.length).fill(null);
+    let score = 0;
+    let timerInterval;
+    let timeRemaining = quizData.timeLimit;
+
+    function displayQuestion() {
+      const current = quizData.questions[currentQuestionIndex];
+      document.getElementById("questionText").textContent = current.question;
+      const optionsList = document.getElementById("optionsList");
+      optionsList.innerHTML = "";
+      current.options.forEach((opt, i) => {
+        const li = document.createElement("li");
+        li.textContent = opt;
+        li.onclick = () => selectOption(i);
+        if (selectedAnswers[currentQuestionIndex] === i) {
+          li.classList.add("selected");
+        }
+        optionsList.appendChild(li);
+      });
+      document.getElementById("currentQuestion").textContent = currentQuestionIndex + 1;
+      document.getElementById("totalQuestions").textContent = quizData.questions.length;
+    }
+
+    function selectOption(index) {
+      selectedAnswers[currentQuestionIndex] = index;
+      displayQuestion(); // Refresh selection
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < quizData.questions.length - 1) {
+        currentQuestionIndex++;
+        displayQuestion();
+        updateProgress();
+        updateStats();
+      } else {
+        alert("You've reached the last question. Submit your quiz!");
+      }
+    }
+
+    function updateProgress() {
+      const percent = ((currentQuestionIndex + 1) / quizData.questions.length) * 100;
+      document.getElementById("progressBar").style.width = `${percent}%`;
+    }
+
+    function updateStats() {
+      document.getElementById("score").textContent = score;
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        if (timeRemaining > 0) {
+          timeRemaining--;
+          document.getElementById("timer").textContent = timeRemaining;
+        } else {
+          clearInterval(timerInterval);
+          submitQuiz();
+        }
+      }, 1000);
+    }
+
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      score = 0;
+      quizData.questions.forEach((q, index) => {
+        if (selectedAnswers[index] === q.correct) {
+          score++;
+        }
+      });
+
+      const timeTaken = quizData.timeLimit - timeRemaining;
+      const minutes = Math.floor(timeTaken / 60);
+      const seconds = timeTaken % 60;
+      const timeTakenString = `${minutes}m ${seconds}s`;
+
+      document.getElementById('finalScore').textContent = `${score} / ${quizData.questions.length}`;
+      document.getElementById('timeTaken').textContent = timeTakenString;
+      document.getElementById('quizComplete').classList.add('show');
+      document.getElementById('questionCard').style.display = 'none';
+      document.querySelector('.quiz-actions').style.display = 'none';
+      document.getElementById('quizStats').style.display = 'none';
+
+      document.getElementById('quizComplete').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function retakeQuiz() {
+      currentQuestionIndex = 0;
+      selectedAnswers = new Array(quizData.questions.length).fill(null);
+      score = 0;
+      timeRemaining = quizData.timeLimit;
+      clearInterval(timerInterval);
+      startTimer();
+
+      document.getElementById('quizComplete').classList.remove('show');
+      document.getElementById('questionCard').style.display = 'block';
+      document.querySelector('.quiz-actions').style.display = 'flex';
+      document.getElementById('quizStats').style.display = 'block';
+
+      displayQuestion();
+      updateProgress();
+      updateStats();
+    }
+
+    function viewResults() {
+      let result = "";
+      quizData.questions.forEach((q, i) => {
+        const selected = selectedAnswers[i];
+        const isCorrect = selected === q.correct;
+        result += `Q${i + 1}: ${q.question}\n`;
+        result += `Your answer: ${q.options[selected] || "Not answered"}\n`;
+        result += `Correct answer: ${q.options[q.correct]}\n`;
+        result += `Result: ${isCorrect ? "✅ Correct" : "❌ Incorrect"}\n\n`;
+      });
+      alert(result);
+    }
+
+    // Init
+    displayQuestion();
+    startTimer();
+    updateProgress();
+    updateStats();
+  </script>
+
+</body>
+</html>

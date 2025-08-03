@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>Quizzes</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0f23, #0d47a1);
+      color: white;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px;
+    }
+
+    .main-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, #64b5f6, #42a5f5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      margin-bottom: 20px;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin-bottom: 30px;
+    }
+
+    .breadcrumb-separator {
+      color: #64b5f6;
+    }
+
+    .concepts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .concept-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .concept-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #64b5f6, #42a5f5, #1e88e5);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .concept-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .concept-card:hover::before {
+      opacity: 1;
+    }
+
+    .concept-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .concept-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #64b5f6;
+    }
+
+    .difficulty-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .difficulty-beginner {
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .difficulty-intermediate {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffb74d;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .difficulty-advanced {
+      background: rgba(244, 67, 54, 0.2);
+      color: #e57373;
+      border: 1px solid rgba(244, 67, 54, 0.3);
+    }
+
+    .concept-description {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      opacity: 0.8;
+      margin-bottom: 20px;
+    }
+
+    .quiz-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #64b5f6;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .quiz-button {
+      width: 100%;
+      padding: 14px 24px;
+      background: linear-gradient(45deg, #1e88e5, #42a5f5);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .quiz-button:hover {
+      background: linear-gradient(45deg, #1565c0, #1e88e5);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
+    }
+
+    .quiz-button:active {
+      transform: translateY(-1px);
+    }
+
+    .topics-overview {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+
+    .overview-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #64b5f6;
+    }
+
+    .overview-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .overview-stat {
+      text-align: center;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+    }
+
+    .overview-stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #42a5f5;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .overview-stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .concepts-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .quiz-stats {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .overview-stats {
+        grid-template-columns: 1fr;
+      }
+      
+      .main-title {
+        font-size: 2rem;
+      }
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="#" class="back-button" onclick="history.back()">
+      ← Back to Topics
+    </a>
+
+    <div class="header">
+      <h1 class="main-title" id="quizHeading">Quizzes</h1>
+      <div class="breadcrumb" id="breadcrumb">
+        <span>Home</span>
+        <span class="breadcrumb-separator">›</span>
+        <span id="topicBreadcrumb">Topic</span>
+        <span class="breadcrumb-separator">›</span>
+        <span id="subtopicBreadcrumb">Subtopic</span>
+        <span class="breadcrumb-separator">›</span>
+        <span>Quizzes</span>
+      </div>
+    </div>
+
+    <div class="topics-overview">
+      <h2 class="overview-title">Quiz Overview</h2>
+      <div class="overview-stats">
+        <div class="overview-stat">
+          <span class="overview-stat-number" id="totalConcepts">8</span>
+          <span class="overview-stat-label">Total Concepts</span>
+        </div>
+        <div class="overview-stat">
+          <span class="overview-stat-number" id="totalAttempts">1,247</span>
+          <span class="overview-stat-label">Total Attempts</span>
+        </div>
+        <div class="overview-stat">
+          <span class="overview-stat-number" id="avgScore">78%</span>
+          <span class="overview-stat-label">Average Score</span>
+        </div>
+        <div class="overview-stat">
+          <span class="overview-stat-number" id="activeUsers">89</span>
+          <span class="overview-stat-label">Active Users</span>
+        </div>
+      </div>
+    </div>
+<button class="quiz-button" id="startMainQuizBtn" style="margin: 0 auto 30px; display: block; max-width: 220px;">
+  Start Quiz
+</button>
+
+    <div class="concepts-grid" id="conceptsGrid">
+      <!-- Concepts will be dynamically loaded here -->
+    </div>
+  </div>
+
+  <script>
+    // Topic concepts database
+    const topicConcepts = {
+      'web-development': {
+        'javascript': [
+          {
+            title: 'Variables and Data Types',
+            description: 'Learn about different data types in JavaScript including strings, numbers, booleans, arrays, and objects.',
+            difficulty: 'beginner',
+            duration: 15,
+            attempts: 156,
+            avgScore: 85,
+            questions: 20
+          },
+          {
+            title: 'Functions and Scope',
+            description: 'Master function declarations, expressions, arrow functions, and understand variable scope in JavaScript.',
+            difficulty: 'intermediate',
+            duration: 20,
+            attempts: 134,
+            avgScore: 78,
+            questions: 25
+          },
+          {
+            title: 'DOM Manipulation',
+            description: 'Learn to interact with HTML elements, handle events, and dynamically modify web page content.',
+            difficulty: 'intermediate',
+            duration: 25,
+            attempts: 98,
+            avgScore: 72,
+            questions: 30
+          },
+          {
+            title: 'Asynchronous JavaScript',
+            description: 'Understand promises, async/await, callbacks, and handling asynchronous operations in JavaScript.',
+            difficulty: 'advanced',
+            duration: 30,
+            attempts: 67,
+            avgScore: 65,
+            questions: 35
+          },
+          {
+            title: 'ES6+ Features',
+            description: 'Explore modern JavaScript features like destructuring, spread operator, template literals, and modules.',
+            difficulty: 'intermediate',
+            duration: 22,
+            attempts: 89,
+            avgScore: 81,
+            questions: 28
+          },
+          {
+            title: 'Error Handling',
+            description: 'Learn proper error handling techniques using try-catch blocks and error objects.',
+            difficulty: 'beginner',
+            duration: 18,
+            attempts: 112,
+            avgScore: 88,
+            questions: 22
+          },
+          {
+            title: 'Object-Oriented Programming',
+            description: 'Master classes, inheritance, prototypes, and object-oriented programming concepts in JavaScript.',
+            difficulty: 'advanced',
+            duration: 35,
+            attempts: 54,
+            avgScore: 63,
+            questions: 40
+          },
+          {
+            title: 'Regular Expressions',
+            description: 'Learn pattern matching and text manipulation using regular expressions in JavaScript.',
+            difficulty: 'advanced',
+            duration: 28,
+            attempts: 43,
+            avgScore: 58,
+            questions: 32
+          }
+        ],
+        'react': [
+          {
+            title: 'Components and JSX',
+            description: 'Learn the fundamentals of React components, JSX syntax, and component composition.',
+            difficulty: 'beginner',
+            duration: 20,
+            attempts: 145,
+            avgScore: 82,
+            questions: 25
+          },
+          {
+            title: 'State and Props',
+            description: 'Master state management and data flow between components using props.',
+            difficulty: 'beginner',
+            duration: 25,
+            attempts: 128,
+            avgScore: 79,
+            questions: 30
+          },
+          {
+            title: 'Hooks (useState, useEffect)',
+            description: 'Understand React Hooks for state management and side effects in functional components.',
+            difficulty: 'intermediate',
+            duration: 30,
+            attempts: 96,
+            avgScore: 74,
+            questions: 35
+          },
+          {
+            title: 'Event Handling',
+            description: 'Learn to handle user interactions and events in React applications.',
+            difficulty: 'beginner',
+            duration: 18,
+            attempts: 134,
+            avgScore: 86,
+            questions: 22
+          },
+          {
+            title: 'Conditional Rendering',
+            description: 'Master techniques for conditionally rendering components and content.',
+            difficulty: 'intermediate',
+            duration: 22,
+            attempts: 107,
+            avgScore: 77,
+            questions: 28
+          },
+          {
+            title: 'Lists and Keys',
+            description: 'Learn to render dynamic lists of components and understand the importance of keys.',
+            difficulty: 'intermediate',
+            duration: 20,
+            attempts: 118,
+            avgScore: 80,
+            questions: 26
+          },
+          {
+            title: 'Context API',
+            description: 'Understand React Context for managing global state across components.',
+            difficulty: 'advanced',
+            duration: 35,
+            attempts: 67,
+            avgScore: 68,
+            questions: 38
+          },
+          {
+            title: 'Custom Hooks',
+            description: 'Learn to create reusable custom hooks for sharing stateful logic between components.',
+            difficulty: 'advanced',
+            duration: 32,
+            attempts: 52,
+            avgScore: 64,
+            questions: 36
+          }
+        ],
+        'html-css': [
+          {
+            title: 'HTML Structure and Semantics',
+            description: 'Learn proper HTML document structure, semantic elements, and accessibility best practices.',
+            difficulty: 'beginner',
+            duration: 15,
+            attempts: 189,
+            avgScore: 87,
+            questions: 20
+          },
+          {
+            title: 'CSS Selectors and Properties',
+            description: 'Master CSS selectors, properties, and styling techniques for web layouts.',
+            difficulty: 'beginner',
+            duration: 20,
+            attempts: 167,
+            avgScore: 83,
+            questions: 25
+          },
+          {
+            title: 'Flexbox Layout',
+            description: 'Learn CSS Flexbox for creating flexible and responsive layouts.',
+            difficulty: 'intermediate',
+            duration: 25,
+            attempts: 134,
+            avgScore: 76,
+            questions: 30
+          },
+          {
+            title: 'CSS Grid Layout',
+            description: 'Master CSS Grid for creating complex two-dimensional layouts.',
+            difficulty: 'intermediate',
+            duration: 28,
+            attempts: 98,
+            avgScore: 72,
+            questions: 32
+          },
+          {
+            title: 'Responsive Design',
+            description: 'Learn media queries and techniques for creating responsive web designs.',
+            difficulty: 'intermediate',
+            duration: 30,
+            attempts: 156,
+            avgScore: 78,
+            questions: 35
+          },
+          {
+            title: 'CSS Animations and Transitions',
+            description: 'Create smooth animations and transitions using CSS properties.',
+            difficulty: 'advanced',
+            duration: 25,
+            attempts: 87,
+            avgScore: 70,
+            questions: 28
+          },
+          {
+            title: 'CSS Preprocessors (Sass/SCSS)',
+            description: 'Learn to use CSS preprocessors for more efficient and maintainable stylesheets.',
+            difficulty: 'advanced',
+            duration: 32,
+            attempts: 65,
+            avgScore: 67,
+            questions: 36
+          },
+          {
+            title: 'CSS-in-JS and Styled Components',
+            description: 'Understand modern CSS-in-JS solutions and component-scoped styling.',
+            difficulty: 'advanced',
+            duration: 28,
+            attempts: 43,
+            avgScore: 61,
+            questions: 32
+          }
+        ]
+      },
+      'data-science': {
+        'python': [
+          {
+            title: 'Python Basics and Syntax',
+            description: 'Learn Python fundamentals including variables, data types, and basic syntax.',
+            difficulty: 'beginner',
+            duration: 18,
+            attempts: 198,
+            avgScore: 89,
+            questions: 22
+          },
+          {
+            title: 'Data Structures (Lists, Dicts, Sets)',
+            description: 'Master Python data structures and their methods for data manipulation.',
+            difficulty: 'beginner',
+            duration: 22,
+            attempts: 167,
+            avgScore: 84,
+            questions: 28
+          },
+          {
+            title: 'Functions and Modules',
+            description: 'Learn to create reusable functions and organize code using modules.',
+            difficulty: 'intermediate',
+            duration: 25,
+            attempts: 134,
+            avgScore: 79,
+            questions: 30
+          },
+          {
+            title: 'File I/O and Exception Handling',
+            description: 'Handle file operations and manage errors gracefully in Python.',
+            difficulty: 'intermediate',
+            duration: 20,
+            attempts: 112,
+            avgScore: 77,
+            questions: 26
+          },
+          {
+            title: 'Object-Oriented Programming',
+            description: 'Master classes, objects, inheritance, and OOP principles in Python.',
+            difficulty: 'advanced',
+            duration: 35,
+            attempts: 89,
+            avgScore: 71,
+            questions: 38
+          },
+          {
+            title: 'Decorators and Generators',
+            description: 'Learn advanced Python features like decorators and generator functions.',
+            difficulty: 'advanced',
+            duration: 30,
+            attempts: 67,
+            avgScore: 65,
+            questions: 34
+          },
+          {
+            title: 'Lambda Functions and Comprehensions',
+            description: 'Master lambda functions, list comprehensions, and functional programming concepts.',
+            difficulty: 'intermediate',
+            duration: 25,
+            attempts: 98,
+            avgScore: 82,
+            questions: 30
+          },
+          {
+            title: 'Regular Expressions',
+            description: 'Learn pattern matching and text processing using Python regex.',
+            difficulty: 'advanced',
+            duration: 28,
+            attempts: 54,
+            avgScore: 62,
+            questions: 32
+          }
+        ],
+        'machine-learning': [
+          {
+            title: 'Introduction to ML Concepts',
+            description: 'Learn fundamental machine learning concepts, types of learning, and basic terminology.',
+            difficulty: 'beginner',
+            duration: 25,
+            attempts: 156,
+            avgScore: 81,
+            questions: 30
+          },
+          {
+            title: 'Data Preprocessing',
+            description: 'Master data cleaning, normalization, and feature engineering techniques.',
+            difficulty: 'intermediate',
+            duration: 30,
+            attempts: 123,
+            avgScore: 76,
+            questions: 35
+          },
+          {
+            title: 'Supervised Learning Algorithms',
+            description: 'Learn classification and regression algorithms including linear regression and decision trees.',
+            difficulty: 'intermediate',
+            duration: 35,
+            attempts: 98,
+            avgScore: 73,
+            questions: 40
+          },
+          {
+            title: 'Unsupervised Learning',
+            description: 'Understand clustering, dimensionality reduction, and association rule learning.',
+            difficulty: 'advanced',
+            duration: 32,
+            attempts: 76,
+            avgScore: 68,
+            questions: 36
+          },
+          {
+            title: 'Model Evaluation and Validation',
+            description: 'Learn cross-validation, performance metrics, and model selection techniques.',
+            difficulty: 'intermediate',
+            duration: 28,
+            attempts: 134,
+            avgScore: 79,
+            questions: 32
+          },
+          {
+            title: 'Neural Networks Basics',
+            description: 'Introduction to artificial neural networks, perceptrons, and basic deep learning.',
+            difficulty: 'advanced',
+            duration: 40,
+            attempts: 67,
+            avgScore: 64,
+            questions: 42
+          },
+          {
+            title: 'Feature Selection and Engineering',
+            description: 'Master techniques for selecting relevant features and creating new ones.',
+            difficulty: 'advanced',
+            duration: 35,
+            attempts: 89,
+            avgScore: 70,
+            questions: 38
+          },
+          {
+            title: 'Ensemble Methods',
+            description: 'Learn bagging, boosting, and stacking techniques for improving model performance.',
+            difficulty: 'advanced',
+            duration: 38,
+            attempts: 54,
+            avgScore: 66,
+            questions: 40
+          }
+        ]
+      }
+    };
+
+    // Get URL parameters
+    function getUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return {
+        topic: urlParams.get('topic') || 'web-development',
+        subtopic: urlParams.get('subtopic') || 'javascript'
+      };
+    }
+
+    // Format text for display
+    function formatText(text) {
+      return text.replaceAll('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    // Generate random college statistics
+    function generateCollegeStats(baseAttempts) {
+      const colleges = [
+        'MIT', 'Stanford', 'Harvard', 'Berkeley', 'CMU', 'Georgia Tech', 
+        'Caltech', 'University of Washington', 'UIUC', 'UT Austin'
+      ];
+      const randomCollege = colleges[Math.floor(Math.random() * colleges.length)];
+      const collegeUsers = Math.floor(baseAttempts * (0.1 + Math.random() * 0.3));
+      return { college: randomCollege, users: collegeUsers };
+    }
+
+    // Load and display concepts
+    function loadConcepts() {
+      const { topic, subtopic } = getUrlParams();
+      
+      // Update page title and breadcrumb
+      document.title = `${formatText(subtopic)} Quizzes - ${formatText(topic)}`;
+      document.getElementById('quizHeading').textContent = `${formatText(subtopic)} Quizzes`;
+      document.getElementById('topicBreadcrumb').textContent = formatText(topic);
+      document.getElementById('subtopicBreadcrumb').textContent = formatText(subtopic);
+
+      // Get concepts for the current topic and subtopic
+      const concepts = topicConcepts[topic]?.[subtopic] || [];
+      
+      // Update overview statistics
+      const totalAttempts = concepts.reduce((sum, concept) => sum + concept.attempts, 0);
+      const avgScore = Math.round(concepts.reduce((sum, concept) => sum + concept.avgScore, 0) / concepts.length);
+      const activeUsers = Math.floor(totalAttempts * 0.15);
+
+      document.getElementById('totalConcepts').textContent = concepts.length;
+      document.getElementById('totalAttempts').textContent = totalAttempts.toLocaleString();
+      document.getElementById('avgScore').textContent = `${avgScore}%`;
+      document.getElementById('activeUsers').textContent = activeUsers;
+
+      // Generate concept cards
+      const conceptsGrid = document.getElementById('conceptsGrid');
+      conceptsGrid.innerHTML = '';
+
+      concepts.forEach((concept, index) => {
+        const collegeStats = generateCollegeStats(concept.attempts);
+        
+        const conceptCard = document.createElement('div');
+        conceptCard.className = 'concept-card';
+        conceptCard.innerHTML = `
+          <div class="concept-header">
+            <h3 class="concept-title">${concept.title}</h3>
+            <span class="difficulty-badge difficulty-${concept.difficulty}">${concept.difficulty}</span>
+          </div>
+          
+          <p class="concept-description">${concept.description}</p>
+          
+          <div class="quiz-stats">
+            <div class="stat-item">
+              <span class="stat-number">${concept.duration}</span>
+              <span class="stat-label">Minutes</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${concept.questions}</span>
+              <span class="stat-label">Questions</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${concept.attempts}</span>
+              <span class="stat-label">Attempts</span>
+            </div>
+          </div>
+          
+          <div class="quiz-stats">
+            <div class="stat-item">
+              <span class="stat-number">${concept.avgScore}%</span>
+              <span class="stat-label">Avg Score</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${collegeStats.users}</span>
+              <span class="stat-label">${collegeStats.college} Users</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${Math.floor(concept.attempts * 0.8)}</span>
+              <span class="stat-label">Completed</span>
+            </div>
+          </div>
+          
+          <button class="quiz-button" onclick="startQuiz('${concept.title}', ${index})">
+            Take Quiz
+          </button>
+        `;
+        
+        conceptsGrid.appendChild(conceptCard);
+      });
+    }
+
+    // Start quiz function
+    function startQuiz(conceptTitle, index) {
+      const { topic, subtopic } = getUrlParams();
+      alert(`Starting quiz: "${conceptTitle}"\n\nTopic: ${formatText(topic)}\nSubtopic: ${formatText(subtopic)}\n\nThis would redirect to the quiz page with the selected concept.`);
+      
+      // In a real application, you would redirect to the quiz page:
+       window.location.href = `quizinterface.html?topic=${topic}&subtopic=${subtopic}&concept=${index}`;
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', loadConcepts);
+    document.getElementById('startMainQuizBtn').addEventListener('click', function () {
+  const { topic, subtopic } = getUrlParams();
+  const concepts = topicConcepts[topic]?.[subtopic] || [];
+
+  if (concepts.length > 0) {
+    // Redirect to first quiz
+    window.location.href = `quizinterface.html?topic=${topic}&subtopic=${subtopic}&concept=0`;
+  } else {
+    alert("No quizzes available for this topic.");
+  }
+});
+
+  </script>
+</body>
+</html>

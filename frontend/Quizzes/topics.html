@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Topics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /*
+         * CSS Variables for Theming - Matching Dashboard Design
+         */
+        :root {
+            --primary-bg: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0d47a1 100%);
+            --secondary-bg: rgba(13, 71, 161, 0.1);
+            --card-bg: rgba(26, 26, 46, 0.3);
+            --card-border: rgba(13, 71, 161, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --btn-gradient: linear-gradient(135deg, #0d47a1, #1976d2);
+            --btn-hover-shadow: rgba(0, 0, 0, 0.3);
+            --shape-bg: rgba(13, 71, 161, 0.1);
+            --accent-color: #64b5f6;
+        }
+
+        [data-theme="light"] {
+            --primary-bg: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 25%, #90caf9 50%, #64b5f6 75%, #2196f3 100%);
+            --secondary-bg: rgba(33, 150, 243, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.4);
+            --card-border: rgba(33, 150, 243, 0.3);
+            --text-primary: #1a1a2e;
+            --text-secondary: rgba(26, 26, 46, 0.8);
+            --text-muted: rgba(26, 26, 46, 0.6);
+            --btn-gradient: linear-gradient(135deg, #2196f3, #1976d2);
+            --btn-hover-shadow: rgba(0, 0, 0, 0.2);
+            --shape-bg: rgba(255, 255, 255, 0.2);
+            --accent-color: #1976d2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        /*
+         * Floating background shapes
+         */
+        .floating-shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--shape-bg);
+            backdrop-filter: blur(10px);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) { width: 100px; height: 100px; top: 15%; left: 5%; animation-delay: 0s; }
+        .shape:nth-child(2) { width: 150px; height: 150px; top: 70%; right: 10%; animation-delay: 3s; }
+        .shape:nth-child(3) { width: 80px; height: 80px; bottom: 15%; left: 15%; animation-delay: 6s; }
+        .shape:nth-child(4) { width: 120px; height: 120px; top: 40%; right: 30%; animation-delay: 1s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 1; }
+        }
+
+        /*
+         * Theme Toggle Button
+         */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px var(--btn-hover-shadow);
+        }
+
+        .theme-icon { font-size: 20px; color: var(--text-primary); }
+
+        /*
+         * Back Button
+         */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 15px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--btn-hover-shadow);
+            color: var(--accent-color);
+        }
+
+        /*
+         * Main Container
+         */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 20px 40px;
+        }
+
+        /*
+         * Header Section
+         */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .page-title {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 22px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /*
+         * Topics Grid
+         */
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .topic-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--btn-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .topic-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .topic-icon {
+            font-size: 70px;
+            margin-bottom: 25px;
+            display: block;
+            text-align: center;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .topic-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .topic-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .topic-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .topic-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--btn-gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .topic-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--btn-hover-shadow);
+        }
+
+        /*
+         * Responsive Design
+         */
+        @media (max-width: 768px) {
+            .container {
+                padding: 80px 10px 20px;
+            }
+
+            .page-title {
+                font-size: 40px;
+            }
+
+            .page-subtitle {
+                font-size: 18px;
+            }
+
+            .topics-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .topic-card {
+                padding: 25px;
+            }
+
+            .back-btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+
+        /*
+         * Loading Animation
+         */
+        .topic-card {
+            animation: slideUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .topic-card:nth-child(1) { animation-delay: 0.1s; }
+        .topic-card:nth-child(2) { animation-delay: 0.2s; }
+        .topic-card:nth-child(3) { animation-delay: 0.3s; }
+        .topic-card:nth-child(4) { animation-delay: 0.4s; }
+        .topic-card:nth-child(5) { animation-delay: 0.5s; }
+        .topic-card:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="themeToggle">
+        <span class="theme-icon" id="themeIcon">☀️</span>
+    </div>
+
+    <!-- Back Button -->
+    <a href="#" class="back-btn" onclick="history.back()">
+        <span>←</span>
+        <span>Back to Dashboard</span>
+    </a>
+
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="page-title">Quiz Topics</h1>
+            <p class="page-subtitle">Choose a topic to start your learning journey and test your knowledge</p>
+        </div>
+
+        <!-- Topics Grid -->
+        <div class="topics-grid">
+            <!-- Programming Languages -->
+            <div class="topic-card" onclick="navigateToSubtopics('programming')">
+                <div class="topic-icon">💻</div>
+                <h2 class="topic-title">Programming Languages</h2>
+                <p class="topic-description">Master popular programming languages with comprehensive quizzes covering syntax, concepts, and best practices.</p>
+                <div class="topic-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">15</span>
+                        <span class="stat-label">Subtopics</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">280</span>
+                        <span class="stat-label">Questions</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">★ 4.8</span>
+                        <span class="stat-label">Rating</span>
+                    </div>
+                </div>
+                <button class="topic-btn">Explore Topics</button>
+            </div>
+
+            <!-- Data Structures & Algorithms -->
+            <div class="topic-card" onclick="navigateToSubtopics('dsa')">
+                <div class="topic-icon">🔗</div>
+                <h2 class="topic-title">Data Structures & Algorithms</h2>
+                <p class="topic-description">Strengthen your problem-solving skills with quizzes on arrays, trees, graphs, sorting, and algorithmic complexity.</p>
+                <div class="topic-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">12</span>
+                        <span class="stat-label">Subtopics</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">320</span>
+                        <span class="stat-label">Questions</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">★ 4.9</span>
+                        <span class="stat-label">Rating</span>
+                    </div>
+                </div>
+                <button class="topic-btn">Explore Topics</button>
+            </div>
+
+            <!-- Web Development -->
+            <div class="topic-card" onclick="navigateToSubtopics('webdev')">
+                <div class="topic-icon">🌐</div>
+                <h2 class="topic-title">Web Development</h2>
+                <p class="topic-description">Test your knowledge of frontend and backend technologies, frameworks, and modern web development practices.</p>
+                <div class="topic-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">18</span>
+                        <span class="stat-label">Subtopics</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">245</span>
+                        <span class="stat-label">Questions</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">★ 4.7</span>
+                        <span class="stat-label">Rating</span>
+                    </div>
+                </div>
+                <button class="topic-btn">Explore Topics</button>
+            </div>
+
+            <!-- Database Management -->
+            <div class="topic-card" onclick="navigateToSubtopics('database')">
+                <div class="topic-icon">🗄️</div>
+                <h2 class="topic-title">Database Management</h2>
+                <p class="topic-description">Learn SQL, NoSQL, database design principles, and optimization techniques through interactive quizzes.</p>
+                <div class="topic-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">10</span>
+                        <span class="stat-label">Subtopics</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">190</span>
+                        <span class="stat-label">Questions</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">★ 4.6</span>
+                        <span class="stat-label">Rating</span>
+                    </div>
+                </div>
+                <button class="topic-btn">Explore Topics</button>
+            </div>
+
+            <!-- System Design -->
+            <div class="topic-card" onclick="navigateToSubtopics('system-design')">
+                <div class="topic-icon">🏗️</div>
+                <h2 class="topic-title">System Design</h2>
+                <p class="topic-description">Understand scalability, architecture patterns, and system design principles for building robust applications.</p>
+                <div class="topic-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">8</span>
+                        <span class="stat-label">Subtopics</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">150</span>
+                        <span class="stat-label">Questions</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">★ 4.5</span>
+                        <span class="stat-label">Rating</span>
+                    </div>
+                </div>
+                <button class="topic-btn">Explore Topics</button>
+            </div>
+
+            <!-- Computer Networks -->
+            <div class="topic-card" onclick="navigateToSubtopics('networking')">
+                <div class="topic-icon">🌐</div>
+                <h2 class="topic-title">Computer Networks</h2>
+                <p class="topic-description">Master networking concepts, protocols, security, and communication principles with comprehensive quizzes.</p>
+                <div class="topic-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">11</span>
+                        <span class="stat-label">Subtopics</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">210</span>
+                        <span class="stat-label">Questions</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">★ 4.4</span>
+                        <span class="stat-label">Rating</span>
+                    </div>
+                </div>
+                <button class="topic-btn">Explore Topics</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle Functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+
+            // Load saved theme or default to dark
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            });
+        });
+
+        // Navigation Function
+        function navigateToSubtopics(topicId) {
+            // Add a subtle click animation
+            event.target.closest('.topic-card').style.transform = 'scale(0.98)';
+            
+            setTimeout(() => {
+                // This is where you'll navigate to the subtopics page
+                // For now, just log the topic
+                console.log(`Navigating to subtopics for: ${topicId}`);
+                
+                // Example navigation (uncomment when you have the subtopics page):
+                 window.location.href = `subtopics.html?topic=${topicId}`;
+                
+                // Or if using a SPA approach:
+                // loadSubtopics(topicId);
+                
+                alert(`Selected topic: ${topicId}\nSubtopics page will be loaded here.`);
+            }, 150);
+        }
+
+        // Add hover sound effect (optional)
+        document.querySelectorAll('.topic-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                // Optional: Add subtle hover sound
+                // new Audio('hover-sound.mp3').play().catch(() => {});
+            });
+        });
+
+        // Smooth scroll animation for when page loads
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
