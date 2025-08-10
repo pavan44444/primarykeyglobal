@@ -1,97 +1,88 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const db = require("../config/db");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-// Register User
-const registerUser = async (req, res) => {
-  try {
-    const { name, email, password, college, city, role } = req.body;
-    const image = req.file ? req.file.filename : null;
+const JWT_SECRET = "your_secret_key_here";
 
-    if (!name || !email || !password || !college || !city || !role) {
-      return res.status(400).json({ message: 'All fields (name, email, password, college, city, role) are required.' });
-    }
+// === REGISTER ===
+exports.registerUser = async (req, res) => {
+  const {
+    email,
+    password,
+    first_name,
+    last_name,
+    phone,
+    user_type,
+    college_id,
+    graduation_year,
+    branch,
+    profile_picture_url
+  } = req.body;
 
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+  if (!email || !password || !first_name || !last_name || !user_type) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  db.query("SELECT * FROM user WHERE email = ?", [email], async (err, result) => {
+    if (err) return res.status(500).json({ error: err });
+    if (result.length > 0) {
+      return res.status(400).json({ message: "Email already registered" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      image,
-      college,
-      city,
-      role
-    });
-
-    res.status(201).json({
-      message: 'User registered successfully',
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role  // Include role in response
+    const sql = `
+      INSERT INTO user 
+      (email, password_hash, first_name, last_name, phone, user_type, college_id, graduation_year, branch, profile_picture_url) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    db.query(
+      sql,
+      [email, hashedPassword, first_name, last_name, phone, user_type, college_id, graduation_year, branch, profile_picture_url],
+      (err) => {
+        if (err) return res.status(500).json({ error: err });
+        return res.status(201).json({ message: "User registered successfully" });
       }
-    });
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
+    );
+  });
 };
 
-// Login User
-const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+// === LOGIN ===
+exports.loginUser = (req, res) => {
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
+
+  db.query("SELECT * FROM user WHERE email = ?", [email], async (err, result) => {
+    if (err) return res.status(500).json({ error: err });
+    if (result.length === 0) {
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
+    const user = result[0];
+    const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // FIXED: Include role in JWT token
     const token = jwt.sign(
-      { 
-        userId: user.id, 
-        email: user.email,
-        role: user.role  // Add role to JWT payload
-      },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '24h' }
+      { user_id: user.user_id, email: user.email, user_type: user.user_type },
+      JWT_SECRET,
+      { expiresIn: "1h" }
     );
 
-    res.json({
-      message: 'Login successful',
+    return res.status(200).json({
+      message: "Login successful",
       token,
       user: {
-        id: user.id,
-        name: user.name,
+        user_id: user.user_id,
         email: user.email,
-        image: user.image,
-        role: user.role  // Include role in response
+        first_name: user.first_name,
+        last_name: user.last_name,
+        user_type: user.user_type
       }
     });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-};
-
-module.exports = {
-  registerUser,
-  loginUser
+  });
 };
