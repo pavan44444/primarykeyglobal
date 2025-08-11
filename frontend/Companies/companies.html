@@ -54,6 +54,7 @@
       font-size: 1.2em;
       font-weight: 600;
       margin-bottom: 10px;
+      text-transform: capitalize;
     }
 
     .job-role, .package {
@@ -67,49 +68,100 @@
 
   <header>🏢 Companies Visited</header>
 
-  <section class="company-container">
-    <div class="company-card">
-      <img src="https://logo.clearbit.com/google.com" alt="Google" class="company-logo" />
-      <div class="company-name">Google</div>
-      <div class="job-role">Software Engineer</div>
-      <div class="package">Package: ₹45 LPA</div>
-    </div>
-
-    <div class="company-card">
-      <img src="https://logo.clearbit.com/microsoft.com" alt="Microsoft" class="company-logo" />
-      <div class="company-name">Microsoft</div>
-      <div class="job-role">Product Manager</div>
-      <div class="package">Package: ₹42 LPA</div>
-    </div>
-
-    <div class="company-card">
-      <img src="https://logo.clearbit.com/amazon.com" alt="Amazon" class="company-logo" />
-      <div class="company-name">Amazon</div>
-      <div class="job-role">SDE I</div>
-      <div class="package">Package: ₹32 LPA</div>
-    </div>
-
-    <div class="company-card">
-      <img src="https://logo.clearbit.com/infosys.com" alt="Infosys" class="company-logo" />
-      <div class="company-name">Infosys</div>
-      <div class="job-role">System Engineer</div>
-      <div class="package">Package: ₹4 LPA</div>
-    </div>
-
-    <div class="company-card">
-      <img src="https://logo.clearbit.com/accenture.com" alt="Accenture" class="company-logo" />
-      <div class="company-name">Accenture</div>
-      <div class="job-role">ASE</div>
-      <div class="package">Package: ₹4.5 LPA</div>
-    </div>
-
-    <div class="company-card">
-      <img src="https://logo.clearbit.com/wipro.com" alt="Wipro" class="company-logo" />
-      <div class="company-name">Wipro</div>
-      <div class="job-role">Project Engineer</div>
-      <div class="package">Package: ₹3.6 LPA</div>
-    </div>
+  <section class="company-container" id="companyContainer">
+    <!-- Dynamic company cards will be injected here -->
   </section>
+
+  <script>
+    // Replace this with your actual JWT token or get it dynamically
+    const jwtToken = prompt("Please enter your JWT token:");
+
+    async function fetchCompanies() {
+      try {
+        const response = await fetch('http://localhost:5000/api/companies/college', {
+          headers: {
+            'Authorization': 'Bearer ' + jwtToken,
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.message || 'Failed to fetch companies');
+        }
+
+        const companies = await response.json();
+        return companies;
+      } catch (err) {
+        alert('Error fetching companies: ' + err.message);
+        return [];
+      }
+    }
+
+    function formatPackage(packageStr) {
+      // Assuming package_offered is a string representing amount in INR (e.g., "1500000.00")
+      // Convert to LPA (lakhs per annum) for display: 1 LPA = 100000
+      const amount = parseFloat(packageStr);
+      if (isNaN(amount)) return packageStr;
+
+      return `₹${(amount / 100000).toFixed(2)} LPA`;
+    }
+
+    function getLogoUrl(websiteUrl) {
+      // Clean website url to extract domain for clearbit logo service
+      // e.g. "www.google.com" or "google.com" -> "google.com"
+      if (!websiteUrl) return '';
+
+      let domain = websiteUrl.toLowerCase();
+      domain = domain.replace(/^https?:\/\//, ''); // remove http:// or https:// if present
+      domain = domain.replace(/^www\./, ''); // remove www.
+      domain = domain.split('/')[0]; // remove any trailing paths
+
+      return `https://logo.clearbit.com/${domain}`;
+    }
+
+    function createCompanyCard(company) {
+      const card = document.createElement('div');
+      card.className = 'company-card';
+
+      const logoUrl = getLogoUrl(company.website_url);
+
+      card.innerHTML = `
+        <img src="${logoUrl}" alt="${company.company_name}" class="company-logo" onerror="this.style.display='none'"/>
+        <div class="company-name">${company.company_name}</div>
+        <div class="job-role">${company.job_role}</div>
+        <div class="package">Package: ${formatPackage(company.package_offered)}</div>
+      `;
+
+      return card;
+    }
+
+    async function displayCompanies() {
+      const container = document.getElementById('companyContainer');
+      container.innerHTML = ''; // clear existing content
+
+      if (!jwtToken) {
+        container.innerHTML = '<p>Please provide a valid JWT token to see company visits.</p>';
+        return;
+      }
+
+      const companies = await fetchCompanies();
+
+      if (companies.length === 0) {
+        container.innerHTML = '<p>No companies found for your college.</p>';
+        return;
+      }
+
+      companies.forEach(company => {
+        if(company.is_active === 1) { // show only active companies
+          const card = createCompanyCard(company);
+          container.appendChild(card);
+        }
+      });
+    }
+
+    displayCompanies();
+  </script>
 
 </body>
 </html>
