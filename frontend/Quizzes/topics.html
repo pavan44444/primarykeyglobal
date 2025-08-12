@@ -1,577 +1,642 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Topics</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /*
-         * CSS Variables for Theming - Matching Dashboard Design
-         */
-        :root {
-            --primary-bg: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0d47a1 100%);
-            --secondary-bg: rgba(13, 71, 161, 0.1);
-            --card-bg: rgba(26, 26, 46, 0.3);
-            --card-border: rgba(13, 71, 161, 0.3);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.8);
-            --text-muted: rgba(255, 255, 255, 0.6);
-            --btn-gradient: linear-gradient(135deg, #0d47a1, #1976d2);
-            --btn-hover-shadow: rgba(0, 0, 0, 0.3);
-            --shape-bg: rgba(13, 71, 161, 0.1);
-            --accent-color: #64b5f6;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Quizzes</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        [data-theme="light"] {
-            --primary-bg: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 25%, #90caf9 50%, #64b5f6 75%, #2196f3 100%);
-            --secondary-bg: rgba(33, 150, 243, 0.1);
-            --card-bg: rgba(255, 255, 255, 0.4);
-            --card-border: rgba(33, 150, 243, 0.3);
-            --text-primary: #1a1a2e;
-            --text-secondary: rgba(26, 26, 46, 0.8);
-            --text-muted: rgba(26, 26, 46, 0.6);
-            --btn-gradient: linear-gradient(135deg, #2196f3, #1976d2);
-            --btn-hover-shadow: rgba(0, 0, 0, 0.2);
-            --shape-bg: rgba(255, 255, 255, 0.2);
-            --accent-color: #1976d2;
-        }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0f23, #0d47a1);
+      color: white;
+      padding: 20px;
+      min-height: 100vh;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    .container {
+      max-width: 1200px;
+      margin: auto;
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--primary-bg);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-            transition: background-color 0.3s ease;
-        }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px;
+    }
 
-        /*
-         * Floating background shapes
-         */
-        .floating-shapes {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            overflow: hidden;
-            z-index: -1;
-        }
+    .main-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, #64b5f6, #42a5f5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-        .shape {
-            position: absolute;
-            border-radius: 50%;
-            background: var(--shape-bg);
-            backdrop-filter: blur(10px);
-            animation: float 8s ease-in-out infinite;
-        }
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      margin-bottom: 20px;
+    }
 
-        .shape:nth-child(1) { width: 100px; height: 100px; top: 15%; left: 5%; animation-delay: 0s; }
-        .shape:nth-child(2) { width: 150px; height: 150px; top: 70%; right: 10%; animation-delay: 3s; }
-        .shape:nth-child(3) { width: 80px; height: 80px; bottom: 15%; left: 15%; animation-delay: 6s; }
-        .shape:nth-child(4) { width: 120px; height: 120px; top: 40%; right: 30%; animation-delay: 1s; }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin-bottom: 30px;
+    }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
-            50% { transform: translateY(-30px) rotate(180deg); opacity: 1; }
-        }
+    .breadcrumb-separator {
+      color: #64b5f6;
+    }
 
-        /*
-         * Theme Toggle Button
-         */
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            z-index: 100;
-        }
+    .concepts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
 
-        .theme-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px var(--btn-hover-shadow);
-        }
+    .concept-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
 
-        .theme-icon { font-size: 20px; color: var(--text-primary); }
+    .concept-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #64b5f6, #42a5f5, #1e88e5);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
 
-        /*
-         * Back Button
-         */
-        .back-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 15px;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            z-index: 100;
-            text-decoration: none;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
+    .concept-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
 
-        .back-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px var(--btn-hover-shadow);
-            color: var(--accent-color);
-        }
+    .concept-card:hover::before {
+      opacity: 1;
+    }
 
-        /*
-         * Main Container
-         */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 100px 20px 40px;
-        }
+    .concept-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
 
-        /*
-         * Header Section
-         */
-        .header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
+    .concept-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #64b5f6;
+    }
 
-        .page-title {
-            font-size: 56px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+    .difficulty-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-        .page-subtitle {
-            font-size: 22px;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-        }
+    .difficulty-beginner {
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
 
-        /*
-         * Topics Grid
-         */
-        .topics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
+    .difficulty-intermediate {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffb74d;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
 
-        .topic-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 35px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
+    .difficulty-advanced {
+      background: rgba(244, 67, 54, 0.2);
+      color: #e57373;
+      border: 1px solid rgba(244, 67, 54, 0.3);
+    }
 
-        .topic-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--btn-gradient);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
+    .concept-description {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      opacity: 0.8;
+      margin-bottom: 20px;
+    }
 
-        .topic-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
-        }
+    .quiz-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
 
-        .topic-card:hover::before {
-            transform: scaleX(1);
-        }
+    .stat-item {
+      text-align: center;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
 
-        .topic-icon {
-            font-size: 70px;
-            margin-bottom: 25px;
-            display: block;
-            text-align: center;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-        }
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #64b5f6;
+      display: block;
+      margin-bottom: 4px;
+    }
 
-        .topic-title {
-            font-size: 28px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            text-align: center;
-        }
+    .stat-label {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-        .topic-description {
-            font-size: 16px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            text-align: center;
-            margin-bottom: 25px;
-        }
+    .quiz-button {
+      width: 100%;
+      padding: 14px 24px;
+      background: linear-gradient(45deg, #1e88e5, #42a5f5);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-        .topic-stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-        }
+    .quiz-button:hover {
+      background: linear-gradient(45deg, #1565c0, #1e88e5);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
+    }
 
-        .stat-item {
-            text-align: center;
-            flex: 1;
-        }
+    .quiz-button:active {
+      transform: translateY(-1px);
+    }
 
-        .stat-number {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--accent-color);
-            display: block;
-        }
+    .quiz-button:disabled {
+      background: rgba(255, 255, 255, 0.1);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
 
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 4px;
-        }
+    .topics-overview {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
 
-        .topic-btn {
-            width: 100%;
-            padding: 15px;
-            background: var(--btn-gradient);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
+    .overview-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #64b5f6;
+    }
 
-        .topic-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px var(--btn-hover-shadow);
-        }
+    .overview-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
 
-        /*
-         * Responsive Design
-         */
-        @media (max-width: 768px) {
-            .container {
-                padding: 80px 10px 20px;
-            }
+    .overview-stat {
+      text-align: center;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+    }
 
-            .page-title {
-                font-size: 40px;
-            }
+    .overview-stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #42a5f5;
+      display: block;
+      margin-bottom: 8px;
+    }
 
-            .page-subtitle {
-                font-size: 18px;
-            }
+    .overview-stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
 
-            .topics-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
+    .loading {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
 
-            .topic-card {
-                padding: 25px;
-            }
+    .error {
+      background: rgba(244, 67, 54, 0.1);
+      border: 1px solid rgba(244, 67, 54, 0.3);
+      color: #e57373;
+      padding: 30px;
+      border-radius: 16px;
+      margin: 20px 0;
+      text-align: center;
+    }
 
-            .back-btn {
-                padding: 10px 15px;
-                font-size: 14px;
-            }
-        }
+    .error h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+    }
 
-        /*
-         * Loading Animation
-         */
-        .topic-card {
-            animation: slideUp 0.6s ease forwards;
-            opacity: 0;
-            transform: translateY(30px);
-        }
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top: 3px solid #64b5f6;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
 
-        .topic-card:nth-child(1) { animation-delay: 0.1s; }
-        .topic-card:nth-child(2) { animation-delay: 0.2s; }
-        .topic-card:nth-child(3) { animation-delay: 0.3s; }
-        .topic-card:nth-child(4) { animation-delay: 0.4s; }
-        .topic-card:nth-child(5) { animation-delay: 0.5s; }
-        .topic-card:nth-child(6) { animation-delay: 0.6s; }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-        @keyframes slideUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+    .auth-section {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+
+    .auth-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #64b5f6;
+    }
+
+    .token-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .token-input:focus {
+      outline: none;
+      border-color: #64b5f6;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .token-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .auth-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .auth-status {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .auth-status.connected {
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .auth-status.disconnected {
+      background: rgba(244, 67, 54, 0.2);
+      color: #e57373;
+      border: 1px solid rgba(244, 67, 54, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .concepts-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .quiz-stats {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .overview-stats {
+        grid-template-columns: 1fr;
+      }
+      
+      .main-title {
+        font-size: 2rem;
+      }
+
+      .auth-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(-2px);
+    }
+
+    /* Quiz card animation */
+    .concept-card {
+      animation: slideUp 0.6s ease forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .concept-card:nth-child(1) { animation-delay: 0.1s; }
+    .concept-card:nth-child(2) { animation-delay: 0.2s; }
+    .concept-card:nth-child(3) { animation-delay: 0.3s; }
+    .concept-card:nth-child(4) { animation-delay: 0.4s; }
+    .concept-card:nth-child(5) { animation-delay: 0.5s; }
+    .concept-card:nth-child(6) { animation-delay: 0.6s; }
+
+    @keyframes slideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Theme Toggle -->
-    <div class="theme-toggle" id="themeToggle">
-        <span class="theme-icon" id="themeIcon">☀️</span>
-    </div>
-
-    <!-- Back Button -->
-    <a href="#" class="back-btn" onclick="history.back()">
-        <span>←</span>
-        <span>Back to Dashboard</span>
+  <div class="container">
+    <a href="#" class="back-button" onclick="history.back()">
+      ← Back to Topics
     </a>
 
-    <!-- Floating Background Shapes -->
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
+    <div class="header">
+      <h1 class="main-title" id="quizHeading">Available Quizzes</h1>
+      <div class="breadcrumb" id="breadcrumb">
+        <span>Home</span>
+        <span class="breadcrumb-separator">›</span>
+        <span>Quizzes</span>
+      </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1 class="page-title">Quiz Topics</h1>
-            <p class="page-subtitle">Choose a topic to start your learning journey and test your knowledge</p>
-        </div>
-
-        <!-- Topics Grid -->
-        <div class="topics-grid">
-            <!-- Programming Languages -->
-            <div class="topic-card" onclick="navigateToSubtopics('programming')">
-                <div class="topic-icon">💻</div>
-                <h2 class="topic-title">Programming Languages</h2>
-                <p class="topic-description">Master popular programming languages with comprehensive quizzes covering syntax, concepts, and best practices.</p>
-                <div class="topic-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">15</span>
-                        <span class="stat-label">Subtopics</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">280</span>
-                        <span class="stat-label">Questions</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">★ 4.8</span>
-                        <span class="stat-label">Rating</span>
-                    </div>
-                </div>
-                <button class="topic-btn">Explore Topics</button>
-            </div>
-
-            <!-- Data Structures & Algorithms -->
-            <div class="topic-card" onclick="navigateToSubtopics('dsa')">
-                <div class="topic-icon">🔗</div>
-                <h2 class="topic-title">Data Structures & Algorithms</h2>
-                <p class="topic-description">Strengthen your problem-solving skills with quizzes on arrays, trees, graphs, sorting, and algorithmic complexity.</p>
-                <div class="topic-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">12</span>
-                        <span class="stat-label">Subtopics</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">320</span>
-                        <span class="stat-label">Questions</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">★ 4.9</span>
-                        <span class="stat-label">Rating</span>
-                    </div>
-                </div>
-                <button class="topic-btn">Explore Topics</button>
-            </div>
-
-            <!-- Web Development -->
-            <div class="topic-card" onclick="navigateToSubtopics('webdev')">
-                <div class="topic-icon">🌐</div>
-                <h2 class="topic-title">Web Development</h2>
-                <p class="topic-description">Test your knowledge of frontend and backend technologies, frameworks, and modern web development practices.</p>
-                <div class="topic-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">18</span>
-                        <span class="stat-label">Subtopics</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">245</span>
-                        <span class="stat-label">Questions</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">★ 4.7</span>
-                        <span class="stat-label">Rating</span>
-                    </div>
-                </div>
-                <button class="topic-btn">Explore Topics</button>
-            </div>
-
-            <!-- Database Management -->
-            <div class="topic-card" onclick="navigateToSubtopics('database')">
-                <div class="topic-icon">🗄️</div>
-                <h2 class="topic-title">Database Management</h2>
-                <p class="topic-description">Learn SQL, NoSQL, database design principles, and optimization techniques through interactive quizzes.</p>
-                <div class="topic-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">10</span>
-                        <span class="stat-label">Subtopics</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">190</span>
-                        <span class="stat-label">Questions</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">★ 4.6</span>
-                        <span class="stat-label">Rating</span>
-                    </div>
-                </div>
-                <button class="topic-btn">Explore Topics</button>
-            </div>
-
-            <!-- System Design -->
-            <div class="topic-card" onclick="navigateToSubtopics('system-design')">
-                <div class="topic-icon">🏗️</div>
-                <h2 class="topic-title">System Design</h2>
-                <p class="topic-description">Understand scalability, architecture patterns, and system design principles for building robust applications.</p>
-                <div class="topic-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">8</span>
-                        <span class="stat-label">Subtopics</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">150</span>
-                        <span class="stat-label">Questions</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">★ 4.5</span>
-                        <span class="stat-label">Rating</span>
-                    </div>
-                </div>
-                <button class="topic-btn">Explore Topics</button>
-            </div>
-
-            <!-- Computer Networks -->
-            <div class="topic-card" onclick="navigateToSubtopics('networking')">
-                <div class="topic-icon">🌐</div>
-                <h2 class="topic-title">Computer Networks</h2>
-                <p class="topic-description">Master networking concepts, protocols, security, and communication principles with comprehensive quizzes.</p>
-                <div class="topic-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">11</span>
-                        <span class="stat-label">Subtopics</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">210</span>
-                        <span class="stat-label">Questions</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">★ 4.4</span>
-                        <span class="stat-label">Rating</span>
-                    </div>
-                </div>
-                <button class="topic-btn">Explore Topics</button>
-            </div>
-        </div>
+    <div id="noTokenMessage" class="error" style="display:none; margin-bottom: 20px;">
+      <h3>Authentication Required</h3>
+      <p>Please log in to access quizzes.</p>
     </div>
 
-    <script>
-        // Theme Toggle Functionality
-        document.addEventListener('DOMContentLoaded', () => {
-            const themeToggle = document.getElementById('themeToggle');
-            const themeIcon = document.getElementById('themeIcon');
+    <div class="topics-overview" id="overviewSection" style="display: none;">
+      <h2 class="overview-title">Quiz Overview</h2>
+      <div class="overview-stats">
+        <div class="overview-stat">
+          <span class="overview-stat-number" id="totalQuizzes">-</span>
+          <span class="overview-stat-label">Total Quizzes</span>
+        </div>
+        <div class="overview-stat">
+          <span class="overview-stat-number" id="totalQuestions">-</span>
+          <span class="overview-stat-label">Total Questions</span>
+        </div>
+        <div class="overview-stat">
+          <span class="overview-stat-number" id="totalPoints">-</span>
+          <span class="overview-stat-label">Total Points</span>
+        </div>
+        <div class="overview-stat">
+          <span class="overview-stat-number" id="avgTime">-</span>
+          <span class="overview-stat-label">Avg Time (min)</span>
+        </div>
+      </div>
+    </div>
 
-            // Load saved theme or default to dark
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    <div id="loadingSection" class="loading" style="display: none;">
+      <div class="spinner"></div>
+      Loading quizzes...
+    </div>
 
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-            });
-        });
+    <div id="errorSection" class="error" style="display: none;">
+      <h3>Error Loading Quizzes</h3>
+      <p id="errorMessage">Unable to load quiz data. Please try again later.</p>
+      <button class="quiz-button" onclick="loadQuizzes()" style="margin-top: 15px; max-width: 200px;">Retry</button>
+    </div>
 
-        // Navigation Function
-        function navigateToSubtopics(topicId) {
-            // Add a subtle click animation
-            event.target.closest('.topic-card').style.transform = 'scale(0.98)';
-            
-            setTimeout(() => {
-                // This is where you'll navigate to the subtopics page
-                // For now, just log the topic
-                console.log(`Navigating to subtopics for: ${topicId}`);
-                
-                // Example navigation (uncomment when you have the subtopics page):
-                 window.location.href = `subtopics.html?topic=${topicId}`;
-                
-                // Or if using a SPA approach:
-                // loadSubtopics(topicId);
-                
-                alert(`Selected topic: ${topicId}\nSubtopics page will be loaded here.`);
-            }, 150);
+    <div class="concepts-grid" id="conceptsGrid" style="display: none;">
+      <!-- Quiz cards will be dynamically loaded here -->
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:5000/api';
+    let quizzesData = [];
+    let currentToken = '';
+
+    function getDifficultyLevel(questions) {
+      if (questions <= 3) return 'beginner';
+      if (questions <= 7) return 'intermediate';
+      return 'advanced';
+    }
+
+    function generateDescription(topic, questions) {
+      const descriptions = [
+        `Master the fundamentals of ${topic} with ${questions} comprehensive questions.`,
+        `Test your knowledge in ${topic} through ${questions} challenging questions.`,
+        `Enhance your understanding of ${topic} concepts with this ${questions}-question quiz.`,
+        `Evaluate your skills in ${topic} with ${questions} well-crafted questions.`
+      ];
+      return descriptions[Math.floor(Math.random() * descriptions.length)];
+    }
+
+    async function fetchQuizzes() {
+      if (!currentToken) {
+        throw new Error('Authentication token not found. Please log in.');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/quizzes`, {
+        headers: {
+          'Authorization': `Bearer ${currentToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Invalid or expired token. Please log in again.');
+        } else if (response.status === 403) {
+          throw new Error('Access denied. You do not have permission to access this resource.');
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.quizzes) {
+        return data.quizzes;
+      } else {
+        throw new Error('Invalid API response format');
+      }
+    }
+
+    function displayError(message) {
+      document.getElementById('loadingSection').style.display = 'none';
+      document.getElementById('conceptsGrid').style.display = 'none';
+      document.getElementById('overviewSection').style.display = 'none';
+      document.getElementById('errorSection').style.display = 'block';
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('noTokenMessage').style.display = 'none';
+    }
+
+    function updateOverviewStats(quizzes) {
+      const totalQuizzes = quizzes.length;
+      const totalQuestions = quizzes.reduce((sum, quiz) => sum + quiz.no_of_questions, 0);
+      const totalPoints = quizzes.reduce((sum, quiz) => sum + quiz.total_points, 0);
+      const avgTime = Math.round(quizzes.reduce((sum, quiz) => sum + quiz.time_seconds, 0) / quizzes.length / 60);
+
+      document.getElementById('totalQuizzes').textContent = totalQuizzes;
+      document.getElementById('totalQuestions').textContent = totalQuestions;
+      document.getElementById('totalPoints').textContent = totalPoints;
+      document.getElementById('avgTime').textContent = `${avgTime} min`;
+    }
+
+    function renderQuizCards(quizzes) {
+      const conceptsGrid = document.getElementById('conceptsGrid');
+      conceptsGrid.innerHTML = '';
+
+      quizzes.forEach((quiz, index) => {
+        const difficulty = getDifficultyLevel(quiz.no_of_questions);
+        const description = generateDescription(quiz.topic, quiz.no_of_questions);
+        const timeMinutes = Math.ceil(quiz.time_seconds / 60);
+
+        const quizCard = document.createElement('div');
+        quizCard.className = 'concept-card';
+        quizCard.style.animationDelay = `${(index + 1) * 0.1}s`;
+
+        quizCard.innerHTML = `
+          <div class="concept-header">
+            <h3 class="concept-title">${quiz.topic}</h3>
+            <span class="difficulty-badge difficulty-${difficulty}">${difficulty}</span>
+          </div>
+          <p class="concept-description">${description}</p>
+          <div class="quiz-stats">
+            <div class="stat-item">
+              <span class="stat-number">${timeMinutes}</span>
+              <span class="stat-label">Minutes</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${quiz.no_of_questions}</span>
+              <span class="stat-label">Questions</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${quiz.total_points}</span>
+              <span class="stat-label">Points</span>
+            </div>
+          </div>
+          <div class="quiz-stats">
+            <div class="stat-item">
+              <span class="stat-number">${quiz.points_per_question}</span>
+              <span class="stat-label">Points/Q</span>
+            </div>
+          </div>
+          <button class="quiz-button" onclick="startQuiz(${quiz.quiz_id}, '${quiz.topic}', ${index})">
+            Start Quiz
+          </button>
+        `;
+
+        conceptsGrid.appendChild(quizCard);
+      });
+    }
+
+    async function loadQuizzes() {
+      document.getElementById('errorSection').style.display = 'none';
+      document.getElementById('noTokenMessage').style.display = 'none';
+
+      currentToken = localStorage.getItem('authToken');
+      if (!currentToken) {
+        document.getElementById('noTokenMessage').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('loadingSection').style.display = 'flex';
+      document.getElementById('conceptsGrid').style.display = 'none';
+      document.getElementById('overviewSection').style.display = 'none';
+
+      try {
+        quizzesData = await fetchQuizzes();
+
+        if (quizzesData.length === 0) {
+          throw new Error('No quizzes available');
         }
 
-        // Add hover sound effect (optional)
-        document.querySelectorAll('.topic-card').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                // Optional: Add subtle hover sound
-                // new Audio('hover-sound.mp3').play().catch(() => {});
-            });
-        });
+        updateOverviewStats(quizzesData);
+        renderQuizCards(quizzesData);
 
-        // Smooth scroll animation for when page loads
-        window.addEventListener('load', () => {
-            document.body.style.opacity = '0';
-            setTimeout(() => {
-                document.body.style.transition = 'opacity 0.5s ease';
-                document.body.style.opacity = '1';
-            }, 100);
-        });
-    </script>
+        document.getElementById('loadingSection').style.display = 'none';
+        document.getElementById('overviewSection').style.display = 'block';
+        document.getElementById('conceptsGrid').style.display = 'grid';
+      } catch (error) {
+        displayError(error.message || 'Failed to load quizzes. Please check your connection and try again.');
+      }
+    }
+
+    function startQuiz(quizId, quizTopic, index) {
+      const quiz = quizzesData[index];
+      sessionStorage.setItem('currentQuiz', JSON.stringify(quiz));
+      sessionStorage.setItem('authToken', currentToken);
+      window.location.href = `quizinterface.html?quiz_id=${quizId}`;
+    }
+
+    window.addEventListener('DOMContentLoaded', loadQuizzes);
+  </script>
 </body>
+
 </html>

@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
+
 dotenv.config();
 
 const app = express();
@@ -15,9 +16,14 @@ app.use(bodyParser.json());
 const authRoutes = require('./routes/authRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
 const companyRoutes = require('./routes/companyRoutes');
+const quizRoutes = require('./routes/quizRoutes');
+//const leaderboardRoutes = require('./routes/leaderboardRoutes');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/companies', companyRoutes);
+app.use('/api/quizzes', quizRoutes);
+//app.use("/api/leaderboard", leaderboardRoutes);
 
 // Default route
 app.get('/', (req, res) => {
