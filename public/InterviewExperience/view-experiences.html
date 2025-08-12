@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interview Experiences</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 10px;
+      background: #f9fafb;
+      color: #2c3e50;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    #errorMessage {
+      color: red;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: box-shadow 0.3s ease;
+      overflow: hidden;
+      max-height: 100px;
+      position: relative;
+    }
+    .card:hover {
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .card.expanded {
+      max-height: 1000px; /* big enough to show content */
+      cursor: default;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .card-header > div {
+      margin: 5px 0;
+    }
+    .card-details {
+      margin-top: 15px;
+      font-weight: normal;
+      font-size: 0.95rem;
+      color: #444;
+      display: none;
+    }
+    .card.expanded .card-details {
+      display: block;
+    }
+    .rounds {
+      margin-top: 12px;
+      padding-left: 15px;
+      border-left: 2px solid #3498db;
+    }
+    .round {
+      margin-bottom: 10px;
+    }
+    .round strong {
+      display: block;
+      color: #2980b9;
+      margin-bottom: 3px;
+    }
+    .round p {
+      margin: 0 0 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Interview Experiences by College</h1>
+
+  <div id="errorMessage"></div>
+
+  <div id="experiencesContainer"></div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api/interviews/college';
+    const experiencesContainer = document.getElementById('experiencesContainer');
+    const errorMessage = document.getElementById('errorMessage');
+
+    async function loadExperiences() {
+      errorMessage.textContent = '';
+      experiencesContainer.innerHTML = '';
+
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        errorMessage.textContent = 'Authentication token not found. Please login first.';
+        return;
+      }
+
+      try {
+        const response = await fetch(API_URL, {
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Unauthorized: Invalid or expired token.');
+          } else {
+            throw new Error('Failed to fetch data. Status: ' + response.status);
+          }
+        }
+
+        const experiences = await response.json();
+
+        if (!Array.isArray(experiences) || experiences.length === 0) {
+          experiencesContainer.innerHTML = '<p>No interview experiences found.</p>';
+          return;
+        }
+
+        experiences.forEach(exp => {
+          const card = document.createElement('div');
+          card.classList.add('card');
+
+          // Header info shown on collapsed card
+          card.innerHTML = `
+            <div class="card-header">
+              <div><strong>Student:</strong> ${exp.student_name}</div>
+              <div><strong>Company:</strong> ${exp.company_name}</div>
+              <div><strong>Date Submitted:</strong> ${new Date(exp.created_at).toLocaleDateString()}</div>
+              <div><strong>Rounds:</strong> ${exp.rounds ? exp.rounds.length : 0}</div>
+              <div><strong>Package:</strong> ₹${parseFloat(exp.package_offered).toLocaleString()}</div>
+            </div>
+            <div class="card-details">
+              <p><strong>Job Role:</strong> ${exp.job_role}</p>
+              <p><strong>Location:</strong> ${exp.job_location}</p>
+              <p><strong>Experience Summary:</strong> ${exp.experience_summary}</p>
+              <div class="rounds">
+                <h4>Interview Rounds:</h4>
+              </div>
+            </div>
+          `;
+
+          // Add rounds details inside rounds div
+          const roundsDiv = card.querySelector('.rounds');
+          if (exp.rounds && exp.rounds.length > 0) {
+            exp.rounds.forEach(round => {
+              const roundDiv = document.createElement('div');
+              roundDiv.classList.add('round');
+              roundDiv.innerHTML = `
+                <strong>Round ${round.round_number}: ${round.round_type}</strong>
+                <p>${round.round_description}</p>
+                <p><em>Date: ${new Date(round.round_date).toLocaleDateString()}</em></p>
+              `;
+              roundsDiv.appendChild(roundDiv);
+            });
+          } else {
+            roundsDiv.innerHTML += '<p>No interview rounds details available.</p>';
+          }
+
+          // Toggle expand/collapse on click
+          card.addEventListener('click', () => {
+            card.classList.toggle('expanded');
+          });
+
+          experiencesContainer.appendChild(card);
+        });
+
+      } catch (err) {
+        errorMessage.textContent = err.message;
+      }
+    }
+
+    // Load experiences on page load
+    window.onload = loadExperiences;
+  </script>
+
+</body>
+</html>
