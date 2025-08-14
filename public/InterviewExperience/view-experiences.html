@@ -22,6 +22,9 @@
         --btn-gradient: linear-gradient(135deg, #0d47a1, #1976d2);
         --btn-hover-shadow: rgba(0, 0, 0, 0.3);
         --shape-bg: rgba(13, 71, 161, 0.1);
+        --success-color: #4caf50;
+        --warning-color: #ff9800;
+        --danger-color: #f44336;
     }
 
     [data-theme="light"] {
@@ -128,25 +131,84 @@
     .page-subtitle {
         font-size: 20px;
         color: var(--text-secondary);
-        margin-bottom: 20px;
+        margin-bottom: 30px;
     }
 
-    .back-button {
+    .header-actions {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+    }
+
+    .back-button, .add-experience-btn, .disabled-btn {
         display: inline-block;
         padding: 12px 25px;
-        background: var(--btn-gradient);
         border-radius: 10px;
         color: white;
         text-decoration: none;
         font-weight: 500;
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        margin-bottom: 30px;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 16px;
+        position: relative;
+    }
+
+    .back-button {
+        background: var(--btn-gradient);
     }
 
     .back-button:hover {
         transform: scale(1.05);
         box-shadow: 0 8px 20px var(--btn-hover-shadow);
+    }
+
+    .add-experience-btn {
+        background: linear-gradient(135deg, var(--success-color), #66bb6a);
+    }
+
+    .add-experience-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    .disabled-btn {
+        background: linear-gradient(135deg, #757575, #9e9e9e);
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .disabled-btn:hover {
+        transform: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-message {
+        margin-top: 10px;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .status-warning {
+        background: rgba(255, 152, 0, 0.2);
+        border: 1px solid rgba(255, 152, 0, 0.3);
+        color: var(--warning-color);
+    }
+
+    .status-success {
+        background: rgba(76, 175, 80, 0.2);
+        border: 1px solid rgba(76, 175, 80, 0.3);
+        color: var(--success-color);
     }
 
     #errorMessage {
@@ -334,6 +396,11 @@
             font-size: 36px;
         }
         
+        .header-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+        
         .experiences-grid {
             grid-template-columns: 1fr;
             gap: 20px;
@@ -372,7 +439,15 @@
     <div class="page-header">
       <h1 class="page-title">Interview Experiences</h1>
       <p class="page-subtitle">Learn from your peers' interview journeys</p>
-      <a href="../dashboard.html" class="back-button">← Back to Dashboard</a>
+      
+      <div class="header-actions">
+        <a href="../dashboard/dashboard.html" class="back-button">← Back to Dashboard</a>
+        <button id="addExperienceBtn" class="add-experience-btn" onclick="handleAddExperience()">
+          + Add Experience
+        </button>
+      </div>
+      
+      <div id="statusMessage" class="status-message" style="display: none;"></div>
     </div>
 
     <div id="errorMessage"></div>
@@ -384,8 +459,13 @@
 
   <script>
     const API_URL = 'http://localhost:5000/api/interviews/college';
+   // const CHECK_USER_EXPERIENCE_URL = 'http://localhost:5000/api/interviews/user-status';
     const experiencesContainer = document.getElementById('experiencesContainer');
     const errorMessage = document.getElementById('errorMessage');
+    const addExperienceBtn = document.getElementById('addExperienceBtn');
+    const statusMessage = document.getElementById('statusMessage');
+
+    let userExperienceStatus = null;
 
     // Theme toggle functionality
     document.addEventListener('DOMContentLoaded', () => {
@@ -406,9 +486,108 @@
             themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         });
 
-        // Load experiences
+        // Load user status and experiences
+    //    checkUserExperienceStatus();
         loadExperiences();
     });
+
+    async function checkUserExperienceStatus() {
+        const token = localStorage.getItem('authToken');
+        if (!token) return;
+
+        try {
+            const response = await fetch(CHECK_USER_EXPERIENCE_URL, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                userExperienceStatus = await response.json();
+                updateAddExperienceButton();
+            }
+        } catch (error) {
+            console.error('Error checking user experience status:', error);
+        }
+    }
+
+    function updateAddExperienceButton() {
+        if (!userExperienceStatus) return;
+
+        if (userExperienceStatus.hasExperience) {
+            const lastExperienceDate = new Date(userExperienceStatus.lastExperienceDate);
+            const fourMonthsLater = new Date(lastExperienceDate);
+            fourMonthsLater.setMonth(fourMonthsLater.getMonth() + 4);
+            
+            const now = new Date();
+            const canAddAgain = now >= fourMonthsLater;
+
+            if (!canAddAgain) {
+                // User has experience and cannot add another one yet
+                addExperienceBtn.className = 'disabled-btn';
+                addExperienceBtn.textContent = '⏳ Experience Added';
+                addExperienceBtn.onclick = null;
+                
+                const timeRemaining = Math.ceil((fourMonthsLater - now) / (1000 * 60 * 60 * 24));
+                const monthsRemaining = Math.floor(timeRemaining / 30);
+                const daysRemaining = timeRemaining % 30;
+                
+                statusMessage.className = 'status-message status-warning';
+                statusMessage.style.display = 'block';
+                
+                if (monthsRemaining > 0) {
+                    statusMessage.textContent = `You already added an interview experience. You can add another one after ${monthsRemaining} month(s) and ${daysRemaining} day(s).`;
+                } else {
+                    statusMessage.textContent = `You already added an interview experience. You can add another one after ${daysRemaining} day(s).`;
+                }
+            } else {
+                // User can add another experience
+                statusMessage.className = 'status-message status-success';
+                statusMessage.style.display = 'block';
+                statusMessage.textContent = 'You can now add another interview experience!';
+            }
+        } else {
+            // User hasn't added any experience yet
+            statusMessage.style.display = 'none';
+        }
+    }
+
+    function handleAddExperience() {
+        // Check if user is logged in
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            alert('Please login first to add an interview experience.');
+            return;
+        }
+
+        // Check if user can add experience
+        if (userExperienceStatus && userExperienceStatus.hasExperience) {
+            const lastExperienceDate = new Date(userExperienceStatus.lastExperienceDate);
+            const fourMonthsLater = new Date(lastExperienceDate);
+            fourMonthsLater.setMonth(fourMonthsLater.getMonth() + 4);
+            
+            const now = new Date();
+            if (now < fourMonthsLater) {
+                const timeRemaining = Math.ceil((fourMonthsLater - now) / (1000 * 60 * 60 * 24));
+                const monthsRemaining = Math.floor(timeRemaining / 30);
+                const daysRemaining = timeRemaining % 30;
+                
+                let timeText;
+                if (monthsRemaining > 0) {
+                    timeText = `${monthsRemaining} month(s) and ${daysRemaining} day(s)`;
+                } else {
+                    timeText = `${daysRemaining} day(s)`;
+                }
+                
+                alert(`You already added an interview experience. You can add another one after ${timeText}.`);
+                return;
+            }
+        }
+
+        // Redirect to add experience page
+        window.location.href = 'add-experience.html';
+    }
 
     async function loadExperiences() {
       errorMessage.textContent = '';

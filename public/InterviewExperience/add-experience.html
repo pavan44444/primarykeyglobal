@@ -135,6 +135,15 @@
             margin-bottom: 20px;
         }
 
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
         label {
             display: block;
             margin-bottom: 8px;
@@ -225,6 +234,148 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px var(--btn-hover-shadow);
         }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Modern Popup Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            transform: scale(0.7) translateY(-50px);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--btn-gradient);
+        }
+
+        .modal-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 0.6s ease-out;
+        }
+
+        .modal-icon.success {
+            color: var(--success-color);
+        }
+
+        .modal-icon.error {
+            color: #f44336;
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .modal-message {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            min-width: 120px;
+        }
+
+        .modal-btn-primary {
+            background: var(--btn-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--btn-hover-shadow);
+        }
+
+        .modal-btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--card-border);
+        }
+
+        .modal-btn-secondary:hover {
+            background: var(--card-border);
+            color: var(--text-primary);
+        }
+
+        .success-color {
+            color: #4caf50;
+        }
+
+        .error-color {
+            color: #f44336;
+        }
     </style>
 </head>
 <body>
@@ -242,14 +393,33 @@
     <div class="form-container">
         <h1>Share Your Interview Experience</h1>
         <form id="interviewExperienceForm">
-            <div class="form-group">
-                <label for="companyName">Company Name</label>
-                <input type="text" id="companyName" name="company" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="companyName">Company Name</label>
+                    <input type="text" id="companyName" name="company_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="jobRole">Job Role</label>
+                    <input type="text" id="jobRole" name="job_role" required>
+                </div>
             </div>
-            
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="jobLocation">Job Location</label>
+                    <input type="text" id="jobLocation" name="job_location" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="packageOffered">Package Offered (LPA)</label>
+                    <input type="number" id="packageOffered" name="package_offered" step="0.1" required>
+                </div>
+            </div>
+
             <div class="form-group">
-                <label for="passoutYear">Passout Year</label>
-                <input type="number" id="passoutYear" name="passoutYear" required>
+                <label for="experienceSummary">Experience Summary</label>
+                <textarea id="experienceSummary" name="experience_summary" placeholder="Brief summary of your overall interview experience" required></textarea>
             </div>
 
             <div class="form-group">
@@ -262,14 +432,22 @@
                 <div class="round-tab-container" id="round-tabs"></div>
                 <div id="round-content"></div>
             </div>
-
-            <div class="form-group">
-                <label for="overallDescription">Overall Experience</label>
-                <textarea id="overallDescription" name="description" required></textarea>
-            </div>
             
             <button type="submit" class="submit-btn">Submit Experience</button>
         </form>
+    </div>
+
+    <!-- Modern Popup Modal -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <span id="modalIcon" class="modal-icon">✓</span>
+            <h3 id="modalTitle" class="modal-title">Success!</h3>
+            <p id="modalMessage" class="modal-message">Your message here</p>
+            <div class="modal-buttons">
+                <button id="modalPrimaryBtn" class="modal-btn modal-btn-primary">OK</button>
+                <button id="modalSecondaryBtn" class="modal-btn modal-btn-secondary" style="display: none;">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -299,7 +477,7 @@
             const roundContentContainer = document.getElementById('round-content');
             const form = document.getElementById('interviewExperienceForm');
 
-            const roundTypes = ['Aptitude', 'DSA', 'Technical', 'HR', 'System Design'];
+            const roundTypes = ['Online Coding Test', 'Technical Interview', 'HR Interview', 'System Design', 'Aptitude Test', 'Group Discussion'];
 
             function generateRoundFields(numRounds) {
                 if (numRounds > 0) {
@@ -329,8 +507,12 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="roundDescription-${i}">Description for Round ${i}</label>
-                                    <textarea id="roundDescription-${i}" name="roundDescription-${i}" required></textarea>
+                                    <label for="roundDescription-${i}">Round Description</label>
+                                    <textarea id="roundDescription-${i}" name="roundDescription-${i}" placeholder="Describe what happened in this round, questions asked, etc." required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="roundDate-${i}">Round Date</label>
+                                    <input type="date" id="roundDate-${i}" name="roundDate-${i}" required>
                                 </div>
                             </div>
                         `;
@@ -338,8 +520,10 @@
                     }
 
                     // Activate the first tab by default
-                    document.querySelector('.round-tab').classList.add('active');
-                    document.querySelector('.round-tab-content').classList.add('active');
+                    if (document.querySelector('.round-tab')) {
+                        document.querySelector('.round-tab').classList.add('active');
+                        document.querySelector('.round-tab-content').classList.add('active');
+                    }
                 } else {
                     roundFieldsContainer.style.display = 'none';
                 }
@@ -371,55 +555,143 @@
             // Initial call for one round
             generateRoundFields(1);
 
+            // Modern Popup Functions
+            function showModal(type, title, message, primaryBtnText = 'OK', showSecondary = false, onPrimary = null, onSecondary = null) {
+                const overlay = document.getElementById('modalOverlay');
+                const icon = document.getElementById('modalIcon');
+                const titleEl = document.getElementById('modalTitle');
+                const messageEl = document.getElementById('modalMessage');
+                const primaryBtn = document.getElementById('modalPrimaryBtn');
+                const secondaryBtn = document.getElementById('modalSecondaryBtn');
+
+                // Set content based on type
+                if (type === 'success') {
+                    icon.textContent = '✓';
+                    icon.className = 'modal-icon success';
+                    titleEl.className = 'modal-title success-color';
+                } else if (type === 'error') {
+                    icon.textContent = '✕';
+                    icon.className = 'modal-icon error';
+                    titleEl.className = 'modal-title error-color';
+                } else {
+                    icon.textContent = 'ℹ';
+                    icon.className = 'modal-icon';
+                    titleEl.className = 'modal-title';
+                }
+
+                titleEl.textContent = title;
+                messageEl.textContent = message;
+                primaryBtn.textContent = primaryBtnText;
+
+                // Handle secondary button
+                if (showSecondary) {
+                    secondaryBtn.style.display = 'inline-block';
+                } else {
+                    secondaryBtn.style.display = 'none';
+                }
+
+                // Set up event listeners
+                primaryBtn.onclick = () => {
+                    hideModal();
+                    if (onPrimary) onPrimary();
+                };
+
+                secondaryBtn.onclick = () => {
+                    hideModal();
+                    if (onSecondary) onSecondary();
+                };
+
+                // Show modal
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function hideModal() {
+                const overlay = document.getElementById('modalOverlay');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // Close modal when clicking outside
+            document.getElementById('modalOverlay').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    hideModal();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    hideModal();
+                }
+            });
+
             // API Submission Logic
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                
+                const submitBtn = e.target.querySelector('.submit-btn');
+                submitBtn.textContent = 'Submitting...';
+                submitBtn.classList.add('loading');
 
                 // Collect data for the API request body
                 const formData = new FormData(form);
+                const numRounds = parseInt(formData.get('rounds'));
+                
                 const data = {
-                    passoutYear: parseInt(formData.get('passoutYear')),
-                    company: formData.get('company'),
-                    rounds: parseInt(formData.get('rounds')),
-                    description: formData.get('description'),
-                    roundDetails: []
+                    company_name: formData.get('company_name'),
+                    job_role: formData.get('job_role'),
+                    job_location: formData.get('job_location'),
+                    package_offered: parseFloat(formData.get('package_offered')),
+                    experience_summary: formData.get('experience_summary'),
+                    rounds: []
                 };
 
                 // Collect dynamic round data
-                for (let i = 1; i <= data.rounds; i++) {
+                for (let i = 1; i <= numRounds; i++) {
                     const roundType = document.getElementById(`roundType-${i}`).value;
                     const roundDescription = document.getElementById(`roundDescription-${i}`).value;
-                    if (roundType && roundDescription) {
-                        data.roundDetails.push({
-                            roundNumber: i,
-                            roundType: roundType,
-                            description: roundDescription
+                    const roundDate = document.getElementById(`roundDate-${i}`).value;
+                    
+                    if (roundType && roundDescription && roundDate) {
+                        data.rounds.push({
+                            round_number: i,
+                            round_type: roundType,
+                            round_description: roundDescription,
+                            round_date: roundDate
                         });
                     }
                 }
                 
                 try {
-                    const response = await fetch('http://localhost:3000/api/experiences', {
+                    // Get JWT token from localStorage (you'll need to implement login first)
+                    const token = localStorage.getItem('authToken');
+                    
+                    const response = await fetch('http://localhost:5000/api/interviews/add', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            // You would need to add an Authorization header here for a logged-in user
-                            // 'Authorization': `Bearer ${token}` 
+                            'Authorization': `Bearer ${token}`
                         },
                         body: JSON.stringify(data)
                     });
 
+                    const result = await response.json();
+
                     if (response.ok) {
-                        alert('Interview experience added successfully!');
-                        form.reset();
-                        generateRoundFields(1); // Reset the form to one round
+                        showModal('success', 'Success!', result.message || 'Interview experience added successfully!', 'Continue', false, () => {
+                            form.reset();
+                            generateRoundFields(1); // Reset the form to one round
+                        });
                     } else {
-                        const errorData = await response.json();
-                        alert(`Failed to add experience: ${errorData.message}`);
+                        showModal('error', 'Error', `Failed to add experience: ${result.message || 'Unknown error'}`, 'Try Again');
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
+                    showModal('error', 'Connection Error', 'An error occurred while submitting. Please check your connection and try again.', 'Retry');
+                } finally {
+                    submitBtn.textContent = 'Submit Experience';
+                    submitBtn.classList.remove('loading');
                 }
             });
         });
