@@ -83,24 +83,43 @@
             50% { transform: translateY(-20px) rotate(180deg); }
         }
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 25px;
-  background: #0f0f23;
-  color: #fff;
+    position: relative; /* needed for absolute positioning inside */
+    width: 100%;
+    height: 60px; /* optional, adjust as needed */
+    display: flex;
+    justify-content: flex-end; /* push content to right */
+    align-items: center;
+    padding: 0 25px;
+    background: transparent; /* if you want navbar background */
 }
 
-.profile-section {
-  cursor: pointer;
+.logout-btn {
+    position: fixed; /* fixed relative to viewport */
+    top: 80px; 
+    /* distance from top */
+    right: 40px;     /* distance from right */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--btn-gradient);
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* ensures it's on top of everything */
 }
 
-.profile-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 2px solid #fff;
+.logout-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px var(--btn-hover-shadow);
 }
+
 
         /*
          * Theme Toggle Button
@@ -218,6 +237,18 @@
             transform: scale(1.05);
             box-shadow: 0 8px 20px var(--btn-hover-shadow);
         }
+        .disabled-btn {
+  background-color: #ccc !important;
+  color: #fff !important;
+  cursor: not-allowed;
+   /* disables clicking */
+  opacity: 0.7;
+  text-decoration: none; /* remove underline */
+}
+.disabled-btn:hover {
+    cursor: not-allowed;
+};
+
     </style>
 </head>
 <body>
@@ -239,10 +270,13 @@
             <div class="navbar">
   <!-- existing nav items -->
 
-  <div class="profile-section">
-    <img src="profile.png" alt="Profile" class="profile-icon" id="profileIcon">
-  </div>
+<div class="navbar">
+    <button class="logout-btn" id="logoutBtn">
+      <span class="logout-icon">🚪</span>
+      <span class="logout-text">Logout</span>
+    </button>
 </div>
+
 
         </header>
 
@@ -256,12 +290,14 @@
 </div>
 
             <!-- Card for Quizzes -->
-            <div class="card">
-                <div class="card-icon">🧠</div>
-                <h2 class="card-title">Practice Quizzes</h2>
-                <p class="card-description">Test your knowledge with quizzes for different subjects and companies.</p>
-                <a href="../Quizzes/topics.html" class="card-btn">Start Quiz</a>
-            </div>
+           <div class="card">
+    <div class="card-icon">🧠</div>
+    <h2 class="card-title">Practice Quizzes</h2>
+    <p class="card-description">Test your knowledge with quizzes for different subjects and companies.</p>
+    <!-- <a href="#" class="card-btn" style="background-color: #ccc !important; color: #fff !important; cursor: not-allowed; pointer-events: none; opacity: 0.7;">Coming Soon</a> -->
+     <a href="#" class="card-btn disabled-btn">Coming Soon</a>
+
+</div>
 
             <!-- Card for Companies -->
             <div class="card">
@@ -275,40 +311,53 @@
     <div class="card-icon">🏆</div>
     <h2 class="card-title">Leaderboard</h2>
     <p class="card-description">Climb the ranks and be the Primary Key of your college!</p>
-    <a href="../Leaderboard/leaderboard.html" class="card-btn">View Leaderboard</a>
+    <a href="#" class="card-btn disabled-btn">Coming Soon</a>
+
+     <!-- <a href="#" class="card-btn" style="background-color: #ccc !important; color: #fff !important; cursor: not-allowed; pointer-events: none; opacity: 0.7;">Coming Soon</a> -->
+    <!-- <a href="../Leaderboard/leaderboard.html" class="card-btn">View Leaderboard</a> -->
 </div>
 
         </div>
     </div>
+<script>
+// This script handles the theme toggle functionality,
+// mirroring the logic from your authentication page.
+document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const body = document.body;
 
-    <script>
-        // This script handles the theme toggle functionality,
-        // mirroring the logic from your authentication page.
-        document.addEventListener('DOMContentLoaded', () => {
-            const themeToggle = document.getElementById('themeToggle');
-            const themeIcon = document.getElementById('themeIcon');
-            const body = document.body;
+    // Set the initial theme from localStorage or default to dark
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
-            // Set the initial theme from localStorage or default to dark
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    }); // <-- This closing brace was missing
 
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-            });
-        });
-       
-  document.getElementById("profileIcon").addEventListener("click", function () {
-    window.location.href = "profile.html";
-  });
+    // MOVE LOGOUT LISTENER HERE - OUTSIDE the theme toggle listener
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+        if (confirm("Are you sure you want to logout?")) {
+            // Clear authentication token
+            localStorage.removeItem('authToken');
+            sessionStorage.clear();
+            
+            // Redirect to login page
+            window.location.href = "../auth/registration.html"; // Adjust path as needed
+        }
+    });
 
-
-    </script>
+    // Profile icon click handler
+    document.getElementById("profileIcon").addEventListener("click", function () {
+        window.location.href = "profile.html";
+    });
+});
+</script>
 </body>
 </html>
