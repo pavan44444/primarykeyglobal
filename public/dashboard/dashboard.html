@@ -83,43 +83,24 @@
             50% { transform: translateY(-20px) rotate(180deg); }
         }
 .navbar {
-    position: relative; /* needed for absolute positioning inside */
-    width: 100%;
-    height: 60px; /* optional, adjust as needed */
-    display: flex;
-    justify-content: flex-end; /* push content to right */
-    align-items: center;
-    padding: 0 25px;
-    background: transparent; /* if you want navbar background */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  background: #0f0f23;
+  color: #fff;
 }
 
-.logout-btn {
-    position: fixed; /* fixed relative to viewport */
-    top: 80px; 
-    /* distance from top */
-    right: 40px;     /* distance from right */
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--btn-gradient);
-    border: none;
-    color: white;
-    padding: 10px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    z-index: 1000; /* ensures it's on top of everything */
+.profile-section {
+  cursor: pointer;
 }
 
-.logout-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px var(--btn-hover-shadow);
+.profile-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #fff;
 }
-
 
         /*
          * Theme Toggle Button
@@ -237,18 +218,6 @@
             transform: scale(1.05);
             box-shadow: 0 8px 20px var(--btn-hover-shadow);
         }
-        .disabled-btn {
-  background-color: #ccc !important;
-  color: #fff !important;
-  cursor: not-allowed;
-   /* disables clicking */
-  opacity: 0.7;
-  text-decoration: none; /* remove underline */
-}
-.disabled-btn:hover {
-    cursor: not-allowed;
-};
-
     </style>
 </head>
 <body>
@@ -270,13 +239,10 @@
             <div class="navbar">
   <!-- existing nav items -->
 
-<div class="navbar">
-    <button class="logout-btn" id="logoutBtn">
-      <span class="logout-icon">🚪</span>
-      <span class="logout-text">Logout</span>
-    </button>
+  <div class="profile-section">
+    <img src="profile.png" alt="Profile" class="profile-icon" id="profileIcon">
+  </div>
 </div>
-
 
         </header>
 
@@ -285,79 +251,64 @@
             <div class="card">
     <div class="card-icon">💼</div>
     <h2 class="card-title">Interview Experiences</h2>
-    <p class="card-description">Discover, learn, and get inspired by real stories from candidates who’ve faced interviews at top companies. Share your journey and help others grow.</p>
+    <p class="card-description">Read and share stories from past interviews with companies.</p>
     <a href="../InterviewExperience/view-experiences.html" class="card-btn">View Experiences</a>
 </div>
 
             <!-- Card for Quizzes -->
-           <div class="card">
-    <div class="card-icon">🧠</div>
-    <h2 class="card-title">Practice Quizzes</h2>
-    <p class="card-description">Score big, stay on top, and let everyone know you’re the PrimaryKey champion of your campus!.</p>
-    <!-- <a href="#" class="card-btn" style="background-color: #ccc !important; color: #fff !important; cursor: not-allowed; pointer-events: none; opacity: 0.7;">Coming Soon</a> -->
-     <a href="#" class="card-btn disabled-btn">Coming Soon</a>
-
-</div>
+            <div class="card">
+                <div class="card-icon">🧠</div>
+                <h2 class="card-title">Practice Quizzes</h2>
+                <p class="card-description">Test your knowledge with quizzes for different subjects and companies.</p>
+                <a href="../Quizzes/topics.html" class="card-btn">Start Quiz</a>
+            </div>
 
             <!-- Card for Companies -->
             <div class="card">
                 <div class="card-icon">🏢</div>
                 <h2 class="card-title">Campus Companies</h2>
-                <p class="card-description">Explore company visits at your campus and get inspired for your career journey.</p>
+                <p class="card-description">Get details about the companies visiting your campus this year.</p>
                 <a href="../Companies/companies.html" class="card-btn">Explore Companies</a>
             </div>
             <!-- Card for Leaderboard -->
 <div class="card">
     <div class="card-icon">🏆</div>
     <h2 class="card-title">Leaderboard</h2>
-    <p class="card-description">Challenge yourself, dominate the leaderboard, and own your title as Primary Key!.</p>
-    <a href="#" class="card-btn disabled-btn">Coming Soon</a>
-
-     <!-- <a href="#" class="card-btn" style="background-color: #ccc !important; color: #fff !important; cursor: not-allowed; pointer-events: none; opacity: 0.7;">Coming Soon</a> -->
-    <!-- <a href="../Leaderboard/leaderboard.html" class="card-btn">View Leaderboard</a> -->
+    <p class="card-description">Climb the ranks and be the Primary Key of your college!</p>
+    <a href="../Leaderboard/leaderboard.html" class="card-btn">View Leaderboard</a>
 </div>
 
         </div>
     </div>
-<script>
-// This script handles the theme toggle functionality,
-// mirroring the logic from your authentication page.
-document.addEventListener('DOMContentLoaded', () => {
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
-    const body = document.body;
 
-    // Set the initial theme from localStorage or default to dark
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    <script>
+        // This script handles the theme toggle functionality,
+        // mirroring the logic from your authentication page.
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const body = document.body;
 
-    themeToggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-    }); // <-- This closing brace was missing
+            // Set the initial theme from localStorage or default to dark
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
-    // MOVE LOGOUT LISTENER HERE - OUTSIDE the theme toggle listener
-    document.getElementById("logoutBtn").addEventListener("click", function () {
-        if (confirm("Are you sure you want to logout?")) {
-            // Clear authentication token
-            localStorage.removeItem('authToken');
-            sessionStorage.clear();
-            
-            // Redirect to login page
-            window.location.href = "../auth/registration.html"; // Adjust path as needed
-        }
-    });
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            });
+        });
+       
+  document.getElementById("profileIcon").addEventListener("click", function () {
+    window.location.href = "profile.html";
+  });
 
-    // Profile icon click handler
-    document.getElementById("profileIcon").addEventListener("click", function () {
-        window.location.href = "profile.html";
-    });
-});
-</script>
+
+    </script>
 </body>
 </html>
