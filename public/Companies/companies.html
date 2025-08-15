@@ -78,7 +78,7 @@
 
   async function fetchCompanies() {
     try {
-      const response = await fetch('http://localhost:5000/api/companies/college', {
+      const response = await fetch('${API_URL}/companies/college', {
         headers: {
           'Authorization': 'Bearer ' + jwtToken,
           'Content-Type': 'application/json',
