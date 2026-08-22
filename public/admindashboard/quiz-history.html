@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Quizzes</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0f23, #0d47a1);
+      color: white;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container { max-width: 1200px; margin: auto; }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      padding: 16px 20px;
+    }
+
+    .main-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      background: linear-gradient(45deg, #64b5f6, #42a5f5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      opacity: 0.65;
+    }
+
+    .breadcrumb-separator { color: #64b5f6; }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+    }
+
+    .back-button:hover { background: rgba(255,255,255,0.14); transform: translateX(-2px); }
+
+    /* ── Grid ── */
+    .concepts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    /* ── Card ── */
+    .concept-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 16px 18px;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideUp 0.5s ease forwards;
+    }
+
+    .concept-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #64b5f6, #42a5f5, #1e88e5);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .concept-card:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .concept-card:hover::before { opacity: 1; }
+
+    .concept-card:nth-child(1) { animation-delay: 0.05s; }
+    .concept-card:nth-child(2) { animation-delay: 0.10s; }
+    .concept-card:nth-child(3) { animation-delay: 0.15s; }
+    .concept-card:nth-child(4) { animation-delay: 0.20s; }
+    .concept-card:nth-child(5) { animation-delay: 0.25s; }
+    .concept-card:nth-child(6) { animation-delay: 0.30s; }
+
+    @keyframes slideUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Card header row ── */
+    .concept-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .concept-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #64b5f6;
+      line-height: 1.3;
+      flex: 1;
+    }
+
+    .difficulty-badge {
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .difficulty-beginner {
+      background: rgba(76,175,80,0.18);
+      color: #81c784;
+      border: 1px solid rgba(76,175,80,0.28);
+    }
+
+    .difficulty-intermediate {
+      background: rgba(255,193,7,0.18);
+      color: #ffb74d;
+      border: 1px solid rgba(255,193,7,0.28);
+    }
+
+    .difficulty-advanced {
+      background: rgba(244,67,54,0.18);
+      color: #e57373;
+      border: 1px solid rgba(244,67,54,0.28);
+    }
+
+    /* ── Inline stats row ── */
+    .quiz-stats {
+      display: flex;
+      gap: 0;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .stat-item {
+      flex: 1;
+      text-align: center;
+      padding: 8px 6px;
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-number {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #64b5f6;
+      line-height: 1.2;
+      margin-bottom: 2px;
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      opacity: 0.6;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    /* ── Button ── */
+    .quiz-button {
+      width: 100%;
+      padding: 10px 16px;
+      background: linear-gradient(45deg, #1e88e5, #42a5f5);
+      color: white;
+      border: none;
+      border-radius: 9px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .quiz-button:hover {
+      background: linear-gradient(45deg, #1565c0, #1e88e5);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(30,136,229,0.4);
+    }
+
+    .quiz-button:active { transform: translateY(0); }
+
+    .quiz-button:disabled {
+      background: rgba(255,255,255,0.1);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* ── States ── */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 180px;
+      font-size: 1rem;
+      opacity: 0.75;
+    }
+
+    .spinner {
+      border: 3px solid rgba(255,255,255,0.1);
+      border-radius: 50%;
+      border-top: 3px solid #64b5f6;
+      width: 36px;
+      height: 36px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: rgba(244,67,54,0.1);
+      border: 1px solid rgba(244,67,54,0.3);
+      color: #e57373;
+      padding: 24px;
+      border-radius: 14px;
+      margin: 16px 0;
+      text-align: center;
+    }
+
+    .error h3 { font-size: 1.2rem; margin-bottom: 10px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .concepts-grid { grid-template-columns: 1fr; }
+      .main-title { font-size: 1.6rem; }
+    }
+
+    @media (min-width: 900px) {
+      .concepts-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="#" class="back-button" onclick="history.back()">← Back to Topics</a>
+
+    <div class="header">
+      <h1 class="main-title" id="quizHeading">Available Quizzes</h1>
+      <div class="breadcrumb" id="breadcrumb">
+        <span>Home</span>
+        <span class="breadcrumb-separator">›</span>
+        <span>Quizzes</span>
+      </div>
+    </div>
+
+    <div id="noTokenMessage" class="error" style="display:none;">
+      <h3>Authentication Required</h3>
+      <p>Please log in to access quizzes.</p>
+    </div>
+
+    <div id="loadingSection" class="loading" style="display:none;">
+      <div class="spinner"></div>
+      Loading quizzes...
+    </div>
+
+    <div id="errorSection" class="error" style="display:none;">
+      <h3>Error Loading Quizzes</h3>
+      <p id="errorMessage">Unable to load quiz data. Please try again later.</p>
+      <button class="quiz-button" onclick="loadQuizzes()" style="margin-top:12px; max-width:160px;">Retry</button>
+    </div>
+
+    <div class="concepts-grid" id="conceptsGrid" style="display:none;"></div>
+  </div>
+
+  <script>
+    // const API_URL = "https://primarykey-production-6114.up.railway.app/api/";
+    const API_URL = 'http://localhost:5000/api/';
+
+    let quizzesData = [];
+    let currentToken = '';
+
+    function getDifficultyLevel(questions) {
+      if (questions <= 3) return 'beginner';
+      if (questions <= 7) return 'intermediate';
+      return 'advanced';
+    }
+
+    async function fetchQuizzes() {
+      if (!currentToken) throw new Error('Authentication token not found. Please log in.');
+
+      const response = await fetch(`${API_URL}quizzes`, {
+        headers: {
+          'Authorization': `Bearer ${currentToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) throw new Error('Invalid or expired token. Please log in again.');
+        if (response.status === 403) throw new Error('Access denied. You do not have permission to access this resource.');
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.success && data.quizzes) return data.quizzes;
+      throw new Error('Invalid API response format');
+    }
+
+    function displayError(message) {
+      document.getElementById('loadingSection').style.display = 'none';
+      document.getElementById('conceptsGrid').style.display = 'none';
+      document.getElementById('errorSection').style.display = 'block';
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('noTokenMessage').style.display = 'none';
+    }
+
+    function renderQuizCards(quizzes) {
+      const grid = document.getElementById('conceptsGrid');
+      grid.innerHTML = '';
+
+      quizzes.forEach((quiz, index) => {
+        const difficulty = getDifficultyLevel(quiz.no_of_questions);
+        const timeMinutes = Math.ceil(quiz.time_seconds / 60);
+
+        const card = document.createElement('div');
+        card.className = 'concept-card';
+        card.style.animationDelay = `${(index + 1) * 0.05}s`;
+
+        card.innerHTML = `
+          <div class="concept-header">
+            <h3 class="concept-title">${quiz.topic}</h3>
+            <span class="difficulty-badge difficulty-${difficulty}">${difficulty}</span>
+          </div>
+          <div class="quiz-stats">
+            <div class="stat-item">
+              <span class="stat-number">${timeMinutes}</span>
+              <span class="stat-label">Min</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${quiz.no_of_questions}</span>
+              <span class="stat-label">Questions</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${quiz.total_points}</span>
+              <span class="stat-label">Points</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${quiz.points_per_question}</span>
+              <span class="stat-label">Per Q</span>
+            </div>
+          </div>
+      
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    async function loadQuizzes() {
+      document.getElementById('errorSection').style.display = 'none';
+      document.getElementById('noTokenMessage').style.display = 'none';
+
+      currentToken = localStorage.getItem('authToken');
+      if (!currentToken) {
+        document.getElementById('noTokenMessage').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('loadingSection').style.display = 'flex';
+      document.getElementById('conceptsGrid').style.display = 'none';
+
+      try {
+        quizzesData = await fetchQuizzes();
+        if (quizzesData.length === 0) throw new Error('No quizzes available');
+
+        renderQuizCards(quizzesData);
+
+        document.getElementById('loadingSection').style.display = 'none';
+        document.getElementById('conceptsGrid').style.display = 'grid';
+      } catch (error) {
+        displayError(error.message || 'Failed to load quizzes. Please check your connection and try again.');
+      }
+    }
+
+    function startQuiz(quizId, quizTopic, index) {
+      const quiz = quizzesData[index];
+      sessionStorage.setItem('currentQuiz', JSON.stringify(quiz));
+      sessionStorage.setItem('authToken', currentToken);
+      window.location.href = `quizinterface.html?quiz_id=${quizId}`;
+    }
+
+    window.addEventListener('DOMContentLoaded', loadQuizzes);
+  </script>
+
+  <iframe src="../report.html"
+    style="position:fixed; bottom:20px; right:20px;
+           width:320px; height:250px; border:none;
+           z-index:9999; overflow:visible; background:transparent;">
+  </iframe>
+</body>
+</html>

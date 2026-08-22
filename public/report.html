@@ -1,0 +1,98 @@
+ <div id="reportContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; font-family: Arial, sans-serif;">
+  <!-- Report Button -->
+  <button id="openReportForm" style="padding: 10px 15px; background: linear-gradient(135deg, #ff5f6d, #d9534f); 
+  color: white; border: none; border-radius: 25px; cursor: pointer; box-shadow: 0px 3px 8px rgba(0,0,0,0.2); transition: 0.3s;">
+    🚩 Report Issue
+  </button>
+
+  <!-- Report Form -->
+  <div id="reportForm" style="display: none; margin-top: 10px; background: #fff; padding: 15px; border-radius: 12px; 
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.3); width: 260px; opacity: 0; transform: translateY(20px); transition: all 0.4s ease;">
+    <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #d9534f;">📢 Report an Issue</h3>
+    <textarea id="issueText" placeholder="Describe the issue..." 
+      style="width: 100%; height: 90px; padding: 8px; border-radius: 8px; border: 1px solid #ccc; outline: none; resize: none; 
+      transition: border 0.2s;"
+      onfocus="this.style.border='1px solid #d9534f';" 
+      onblur="this.style.border='1px solid #ccc';"></textarea>
+    <br><br>
+    <button id="submitReport" style="padding: 8px 12px; background: #5cb85c; color: white; border: none; 
+    border-radius: 5px; cursor: pointer; width: 48%;">✅ Submit</button>
+    <button id="closeReportForm" style="padding: 8px 12px; background: #ccc; border: none; border-radius: 5px; 
+    cursor: pointer; width: 48%;">❌ Cancel</button>
+  </div>
+</div>
+
+<!-- Success Popup -->
+<div id="successPopup" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+background: white; padding: 20px 25px; border-radius: 12px; box-shadow: 0px 5px 20px rgba(0,0,0,0.3);
+text-align: center; z-index: 2000; font-family: Arial, sans-serif; width: 300px;">
+  <h2 style="color: #28a745;">✅ Thank You!</h2>
+  <p style="color: #555; font-size: 14px;">
+    Your issue has been reported successfully.<br>
+    We value your feedback and will work to fix it as soon as possible.  
+    You are helping us make this platform better! 🚀
+  </p>
+  <button onclick="document.getElementById('successPopup').style.display='none'" 
+    style="margin-top: 10px; padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">
+    Close
+  </button>
+</div>
+
+<script>
+  const BOT_TOKEN = "8439444928:AAFjCgOcszYsHFBkSZxzT7hRVz1jbNPw8H8";
+  const CHAT_ID = "1024255971";
+
+  const openBtn = document.getElementById("openReportForm");
+  const closeBtn = document.getElementById("closeReportForm");
+  const reportForm = document.getElementById("reportForm");
+  const submitBtn = document.getElementById("submitReport");
+  const popup = document.getElementById("successPopup");
+
+  // Open form with animation
+  openBtn.addEventListener("click", () => {
+    reportForm.style.display = "block";
+    setTimeout(() => {
+      reportForm.style.opacity = "1";
+      reportForm.style.transform = "translateY(0)";
+    }, 10);
+    openBtn.style.display = "none";
+  });
+
+  // Close form
+  closeBtn.addEventListener("click", () => {
+    reportForm.style.opacity = "0";
+    reportForm.style.transform = "translateY(20px)";
+    setTimeout(() => {
+      reportForm.style.display = "none";
+      openBtn.style.display = "inline-block";
+    }, 400);
+  });
+
+  // Submit issue
+  submitBtn.addEventListener("click", () => {
+    const issue = document.getElementById("issueText").value.trim();
+    if (!issue) {
+      alert("⚠️ Please enter an issue before submitting.");
+      return;
+    }
+
+    const message = `🚨 New Issue Reported:\n\n${issue}\n\n📄 Page: ${window.location.href}`;
+
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("issueText").value = "";
+      reportForm.style.display = "none";
+      openBtn.style.display = "inline-block";
+      popup.style.display = "block"; // Show success popup
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      alert("❌ Failed to report issue. Try again.");
+    });
+  });
+</script>

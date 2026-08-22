@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tutorials - PRIMARY KEY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/theme.css">
+  <link rel="stylesheet" href="../assets/sidebar.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      min-height: 100%;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      padding: 20px 32px 40px;
+      gap: 14px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .page-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Search bar */
+    .search-bar {
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-bar input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-bar input:focus {
+      border-color: var(--input-focus-border);
+      background: var(--input-focus-bg);
+    }
+
+    /* Grid + cards */
+    .tutorial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 18px;
+    }
+
+    .tutorial-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid #003882;
+      border-radius: 14px;
+      padding: 20px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      cursor: pointer;
+    }
+
+    .tutorial-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--input-focus-border);
+      background: var(--input-focus-bg);
+    }
+
+    .tutorial-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--btn-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .tutorial-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .tutorial-card h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .tutorial-card p {
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .tutorial-card .go-link {
+      margin-top: auto;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--success-text);
+    }
+
+    /* Loading/Error/Empty states */
+    .loading, .error, .no-data {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      border-radius: 14px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--input-bg);
+      border-top: 4px solid var(--success-text);
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 1s linear infinite;
+      margin-bottom: 14px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: var(--error-bg);
+      border: 2px solid var(--error-border);
+      color: var(--error-text);
+    }
+
+    .error button {
+      margin-top: 12px;
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--error-border);
+      background: transparent;
+      color: var(--error-text);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .error button:hover {
+      background: var(--error-border);
+      color: white;
+    }
+
+    .no-data p {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+      .page {
+        padding: 14px 16px 30px;
+        gap: 10px;
+      }
+
+      .page-title {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <h1 class="page-title">
+        <span>📚</span>
+        <span>Tutorials</span>
+      </h1>
+      <p class="page-subtitle">Browse learning tracks and pick up where you left off.</p>
+    </div>
+
+    <!-- <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search tutorials..." autocomplete="off">
+    </div> -->
+
+    <div id="content-area">
+      <div class="loading" id="loadingState">
+        <div class="loading-spinner"></div>
+        <p style="color: var(--text-secondary); font-size: 14px; font-weight: 600;">Loading tutorials...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    const API_BASE = ''; // set to your API origin if frontend/backend are on different hosts, e.g. 'https://yourapp.up.railway.app'
+    const contentArea = document.getElementById('content-area');
+    let allTutorials = [];
+
+    function iconMarkup(t) {
+      if (t.icon_url) {
+        return `<img src="${escapeAttr(t.icon_url)}" alt="">`;
+      }
+      const initial = (t.title || '?').trim().charAt(0).toUpperCase();
+      return initial;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+
+    function escapeAttr(str) {
+      return (str || '').replace(/"/g, '&quot;');
+    }
+
+    function renderTutorials(list) {
+      if (list.length === 0) {
+        contentArea.innerHTML = `
+          <div class="no-data">
+            <div style="font-size: 42px; margin-bottom: 10px;">📚</div>
+            <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-primary);">No Matches</h3>
+            <p>No tutorials match your search.</p>
+          </div>`;
+        return;
+      }
+
+      contentArea.innerHTML = `
+        <div class="tutorial-grid">
+          ${list.map(t => `
+            <a class="tutorial-card" href="topics.html?tutorial_id=${t.tutorial_id}">
+              <div class="tutorial-icon">${iconMarkup(t)}</div>
+              <h3>${escapeHtml(t.title)}</h3>
+              <p>${escapeHtml(t.description || 'No description available.')}</p>
+              <span class="go-link">Start learning &rarr;</span>
+            </a>
+          `).join('')}
+        </div>`;
+    }
+
+    function renderError(message) {
+      contentArea.innerHTML = `
+        <div class="error">
+          <h3 style="font-size: 18px; margin-bottom: 8px;">⚠️ Error</h3>
+          <p style="font-size: 13px;">${escapeHtml(message)}</p>
+          <button onclick="location.reload()">Retry</button>
+        </div>`;
+    }
+
+    async function loadTutorials() {
+      try {
+        const res = await fetch(`${API_BASE}/api/tutorials`);
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'Failed to load tutorials');
+        }
+
+        allTutorials = data.tutorials || [];
+
+        if (allTutorials.length === 0) {
+          contentArea.innerHTML = `
+            <div class="no-data">
+              <div style="font-size: 42px; margin-bottom: 10px;">📚</div>
+              <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-primary);">No Tutorials Yet</h3>
+              <p>No tutorials published yet. Check back soon.</p>
+            </div>`;
+          return;
+        }
+
+        renderTutorials(allTutorials);
+      } catch (err) {
+        console.error('Error loading tutorials:', err);
+        renderError('Could not load tutorials. Please check your connection and try again.');
+      }
+    }
+
+    // document.getElementById('searchInput').addEventListener('input', (e) => {
+    //   const q = e.target.value.trim().toLowerCase();
+    //   const filtered = allTutorials.filter(t =>
+    //     (t.title || '').toLowerCase().includes(q) ||
+    //     (t.description || '').toLowerCase().includes(q)
+    //   );
+    //   renderTutorials(filtered);
+    // });
+
+    loadTutorials();
+  })();
+  </script>
+  <script src="../assets/sidebar.js"></script>
+</body>
+</html>

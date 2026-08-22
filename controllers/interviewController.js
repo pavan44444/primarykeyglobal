@@ -5,7 +5,9 @@ exports.addExperience = async (req, res) => {
     const connection = await db.getConnection();
     try {
         const { company_name, job_role, job_location, package_offered, experience_summary, rounds } = req.body;
-        const user_id = req.user.user_id; // from JWT
+        const user_id = req.user.id; // from JWT
+
+        console.log("📩 Request body received:", req.body);
 
         // Get user's college_id
         const [userData] = await connection.query(
@@ -42,17 +44,40 @@ exports.addExperience = async (req, res) => {
         );
 
         const experience_id = result.insertId;
+        console.log("✅ Experience inserted with ID:", experience_id);
 
         // Insert interview rounds if provided
         if (Array.isArray(rounds) && rounds.length > 0) {
+            console.log("📌 Rounds to insert:", rounds);
+
+            const formatDate = (dateStr) => {
+                if (!dateStr) return null;
+                if (dateStr.includes("/")) {
+                    const [month, day, year] = dateStr.split("/");
+                    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                }
+                return dateStr; // assume already YYYY-MM-DD
+            };
+
             for (const round of rounds) {
+                const formattedDate = formatDate(round.round_date);
+                console.log("➡️ Inserting round:", { ...round, formattedDate });
+
                 await connection.query(
                     `INSERT INTO interview_rounds 
                     (experience_id, round_number, round_type, round_description, round_date)
                     VALUES (?, ?, ?, ?, ?)`,
-                    [experience_id, round.round_number, round.round_type, round.round_description, round.round_date]
+                    [
+                        experience_id,
+                        round.round_number,
+                        round.round_type,
+                        round.round_description,
+                        formattedDate
+                    ]
                 );
             }
+        } else {
+            console.log("⚠️ No rounds received or not an array");
         }
 
         await connection.commit();
@@ -60,17 +85,18 @@ exports.addExperience = async (req, res) => {
 
     } catch (err) {
         await connection.rollback();
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        console.error("❌ Error inserting experience/rounds:", err);
+        res.status(500).json({ message: 'Server error', error: err.message });
     } finally {
         connection.release();
     }
 };
 
+
 // Fetch Interview Experiences for Same College (with Rounds)
 exports.getExperiencesByCollege = async (req, res) => {
     try {
-        const user_id = req.user.user_id;
+        const user_id = req.user.id;
 
         // Get user's college_id
         const [userData] = await db.query(

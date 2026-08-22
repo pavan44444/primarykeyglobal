@@ -2,36 +2,36 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const path = require('path');
+
 
 dotenv.config();
 
 const app = express();
-
+const topicRoutes = require('./routes/topicRoutes');
+const articleRoutes = require('./routes/articleRoutes');
+const tutorialRoutes = require('./routes/tutorialRoutes');
 // Middlewares
 app.use(cors());
 app.use(bodyParser.json());
-
-// Serve frontend files from public folder
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
 const companyRoutes = require('./routes/companyRoutes');
 const quizRoutes = require('./routes/quizRoutes');
+//const leaderboardRoutes = require('./routes/leaderboardRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/quizzes', quizRoutes);
+//app.use("/api/leaderboard", leaderboardRoutes);
 
 // Homepage → registration.html
 app.get('/', (req, res) => {
-    res.sendFile(
-        path.join(__dirname, 'public', 'auth', 'registration.html')
-    );
+    res.send('API is running...');
 });
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Start server
 const PORT = process.env.PORT || 5000;

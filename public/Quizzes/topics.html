@@ -1,9 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Available Quizzes</title>
+  <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Articles - PRIMARY KEY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/theme.css">
+  <link rel="stylesheet" href="../assets/sidebar.css">
   <style>
     * {
       margin: 0;
@@ -11,278 +22,297 @@
       box-sizing: border-box;
     }
 
+    html, body {
+      min-height: 100%;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #0f0f23, #0d47a1);
-      color: white;
-      padding: 20px;
-      min-height: 100vh;
     }
 
-    .container {
+    .page {
+      display: flex;
+      flex-direction: column;
+      padding: 20px 32px 40px;
+      gap: 14px;
       max-width: 1200px;
-      margin: auto;
+      margin: 0 auto;
     }
 
+    /* Breadcrumb */
+    .breadcrumb {
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .breadcrumb a {
+      color: var(--success-text);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    /* Header */
     .header {
       text-align: center;
-      margin-bottom: 40px;
-      padding: 20px;
+      flex-shrink: 0;
     }
 
-    .main-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-      background: linear-gradient(45deg, #64b5f6, #42a5f5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .subtitle {
-      font-size: 1.2rem;
-      opacity: 0.8;
-      margin-bottom: 20px;
-    }
-
-    .breadcrumb {
+    .header-top {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      font-size: 0.9rem;
-      opacity: 0.7;
-      margin-bottom: 30px;
     }
 
-    .breadcrumb-separator {
-      color: #64b5f6;
+    .article-header-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--btn-gradient);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
     }
 
-    .concepts-grid {
+    .page-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      max-width: 620px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+
+    /* Search bar */
+    .search-bar {
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-bar input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-bar input:focus {
+      border-color: var(--input-focus-border);
+      background: var(--input-focus-bg);
+    }
+
+    /* Grid + cards */
+    .topic-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 24px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
     }
 
-    .concept-card {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      padding: 24px;
-      transition: all 0.3s ease;
+    .topic-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid #003882;
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 220px;
       position: relative;
-      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     }
 
-    .concept-card::before {
-      content: '';
+    .topic-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--input-focus-border);
+    }
+
+    .topic-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .topic-icon {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: 11px;
+      background: var(--btn-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .topic-text {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .topic-text h3 {
+      margin: 0 0 3px;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text-primary);
+    }
+
+    .topic-type {
+      font-size: 10.5px;
+      color: var(--success-text);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Circular progress ring */
+    /* .progress-ring-wrap {
+      position: relative;
+      width: 46px;
+      height: 46px;
+      flex-shrink: 0;
+    } */
+
+    /* .progress-ring-wrap svg {
+      transform: rotate(-90deg);
+      width: 46px;
+      height: 46px;
+    } */
+
+    /* .progress-ring-bg {
+      fill: none;
+      stroke: var(--input-bg);
+      stroke-width: 4;
+    } */
+
+    /* .progress-ring-fill {
+      fill: none;
+      stroke: var(--success-text);
+      stroke-width: 4;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.4s ease;
+    } */
+
+    /* .progress-ring-label {
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #64b5f6, #42a5f5, #1e88e5);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .concept-card:hover {
-      background: rgba(255, 255, 255, 0.08);
-      transform: translateY(-4px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .concept-card:hover::before {
-      opacity: 1;
-    }
-
-    .concept-header {
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-primary);
+    } */
+
+    /* Description */
+    .topic-description {
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    .concept-title {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: #64b5f6;
-    }
-
-    .difficulty-badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .difficulty-beginner {
-      background: rgba(76, 175, 80, 0.2);
-      color: #81c784;
-      border: 1px solid rgba(76, 175, 80, 0.3);
-    }
-
-    .difficulty-intermediate {
-      background: rgba(255, 193, 7, 0.2);
-      color: #ffb74d;
-      border: 1px solid rgba(255, 193, 7, 0.3);
-    }
-
-    .difficulty-advanced {
-      background: rgba(244, 67, 54, 0.2);
-      color: #e57373;
-      border: 1px solid rgba(244, 67, 54, 0.3);
-    }
-
-    .concept-description {
-      font-size: 0.95rem;
-      line-height: 1.6;
-      opacity: 0.8;
-      margin-bottom: 20px;
-    }
-
-    .quiz-stats {
+    /* Footer actions */
+    .topic-footer {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 20px;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--glass-border);
     }
 
-    .stat-item {
-      text-align: center;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .stat-number {
-      font-size: 1.5rem;
+    .topic-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 8px;
+      border: 1px solid var(--glass-border);
+      border-radius: 9px;
+      background: transparent;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 12.5px;
       font-weight: 700;
-      color: #64b5f6;
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .stat-label {
-      font-size: 0.8rem;
-      opacity: 0.7;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .quiz-button {
-      width: 100%;
-      padding: 14px 24px;
-      background: linear-gradient(45deg, #1e88e5, #42a5f5);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 600;
+      transition: all 0.2s ease;
       cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      background-color: #003882;
     }
 
-    .quiz-button:hover {
-      background: linear-gradient(45deg, #1565c0, #1e88e5);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
-    }
-
-    .quiz-button:active {
+    .topic-action:hover {
+      border-color: var(--input-focus-border);
+      background: var(--input-focus-bg);
       transform: translateY(-1px);
     }
 
-    .quiz-button:disabled {
-      background: rgba(255, 255, 255, 0.1);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
+    .action-icon {
+      font-size: 15px;
+      line-height: 1;
     }
 
-    .topics-overview {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 30px;
-    }
-
-    .overview-title {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: #64b5f6;
-    }
-
-    .overview-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-    }
-
-    .overview-stat {
-      text-align: center;
-      padding: 16px;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 12px;
-    }
-
-    .overview-stat-number {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #42a5f5;
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    .overview-stat-label {
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-
-    .loading {
+    /* Loading/Error/Empty states */
+    .loading, .error, .no-data {
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      min-height: 200px;
-      font-size: 1.2rem;
-      opacity: 0.8;
-    }
-
-    .error {
-      background: rgba(244, 67, 54, 0.1);
-      border: 1px solid rgba(244, 67, 54, 0.3);
-      color: #e57373;
-      padding: 30px;
-      border-radius: 16px;
-      margin: 20px 0;
+      justify-content: center;
+      padding: 60px 20px;
+      border-radius: 14px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
       text-align: center;
     }
 
-    .error h3 {
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-    }
-
-    .spinner {
-      border: 3px solid rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      border-top: 3px solid #64b5f6;
+    .loading-spinner {
       width: 40px;
       height: 40px;
+      border: 4px solid var(--input-bg);
+      border-top: 4px solid var(--success-text);
+      border-radius: 50%;
+      display: inline-block;
       animation: spin 1s linear infinite;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
     }
 
     @keyframes spin {
@@ -290,353 +320,264 @@
       100% { transform: rotate(360deg); }
     }
 
-    .auth-section {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 30px;
+    .error {
+      background: var(--error-bg);
+      border: 2px solid var(--error-border);
+      color: var(--error-text);
     }
 
-    .auth-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: #64b5f6;
-    }
-
-    .token-input {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    .error button {
+      margin-top: 12px;
+      padding: 8px 18px;
       border-radius: 8px;
+      border: 1px solid var(--error-border);
+      background: transparent;
+      color: var(--error-text);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .error button:hover {
+      background: var(--error-border);
       color: white;
-      font-size: 0.9rem;
-      margin-bottom: 16px;
-      transition: all 0.3s ease;
     }
 
-    .token-input:focus {
-      outline: none;
-      border-color: #64b5f6;
-      background: rgba(255, 255, 255, 0.08);
+    .no-data p {
+      color: var(--text-secondary);
+      font-size: 13px;
     }
 
-    .token-input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
+    .back-link {
+      display: inline-block;
+      margin-top: 10px;
+      color: var(--success-text);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
     }
 
-    .auth-controls {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .auth-status {
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-
-    .auth-status.connected {
-      background: rgba(76, 175, 80, 0.2);
-      color: #81c784;
-      border: 1px solid rgba(76, 175, 80, 0.3);
-    }
-
-    .auth-status.disconnected {
-      background: rgba(244, 67, 54, 0.2);
-      color: #e57373;
-      border: 1px solid rgba(244, 67, 54, 0.3);
+    .back-link:hover {
+      text-decoration: underline;
     }
 
     @media (max-width: 768px) {
-      .concepts-grid {
+      .page {
+        padding: 14px 16px 30px;
+        gap: 10px;
+      }
+
+      .page-title {
+        font-size: 20px;
+      }
+
+      .topic-grid {
         grid-template-columns: 1fr;
-      }
-      
-      .quiz-stats {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-      
-      .overview-stats {
-        grid-template-columns: 1fr;
-      }
-      
-      .main-title {
-        font-size: 2rem;
-      }
-
-      .auth-controls {
-        flex-direction: column;
-        align-items: stretch;
-      }
-    }
-
-    .back-button {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-    }
-
-    .back-button:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateX(-2px);
-    }
-
-    /* Quiz card animation */
-    .concept-card {
-      animation: slideUp 0.6s ease forwards;
-      opacity: 0;
-      transform: translateY(30px);
-    }
-
-    .concept-card:nth-child(1) { animation-delay: 0.1s; }
-    .concept-card:nth-child(2) { animation-delay: 0.2s; }
-    .concept-card:nth-child(3) { animation-delay: 0.3s; }
-    .concept-card:nth-child(4) { animation-delay: 0.4s; }
-    .concept-card:nth-child(5) { animation-delay: 0.5s; }
-    .concept-card:nth-child(6) { animation-delay: 0.6s; }
-
-    @keyframes slideUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <a href="#" class="back-button" onclick="history.back()">
-      ← Back to Topics
-    </a>
+  <div class="page">
+    <div class="breadcrumb">
+      <a href="tutorials.html">Tutorials</a>
+      <span id="breadcrumbCurrent"></span>
+    </div>
 
     <div class="header">
-      <h1 class="main-title" id="quizHeading">Available Quizzes</h1>
-      <div class="breadcrumb" id="breadcrumb">
-        <span>Home</span>
-        <span class="breadcrumb-separator">›</span>
-        <span>Quizzes</span>
+      <div class="header-top">
+        <div class="article-header-icon">📖</div>
+        <h1 class="page-title" id="tutorialTitle">Loading...</h1>
       </div>
+      <p class="page-subtitle" id="tutorialDescription"></p>
     </div>
 
-    <div id="noTokenMessage" class="error" style="display:none; margin-bottom: 20px;">
-      <h3>Authentication Required</h3>
-      <p>Please log in to access quizzes.</p>
-    </div>
+    <!-- <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search articles..." autocomplete="off">
+    </div> -->
 
-    <div class="topics-overview" id="overviewSection" style="display: none;">
-      <h2 class="overview-title">Quiz Overview</h2>
-      <div class="overview-stats">
-        <div class="overview-stat">
-          <span class="overview-stat-number" id="totalQuizzes">-</span>
-          <span class="overview-stat-label">Total Quizzes</span>
-        </div>
-        <div class="overview-stat">
-          <span class="overview-stat-number" id="totalQuestions">-</span>
-          <span class="overview-stat-label">Total Questions</span>
-        </div>
-        <div class="overview-stat">
-          <span class="overview-stat-number" id="totalPoints">-</span>
-          <span class="overview-stat-label">Total Points</span>
-        </div>
-        <div class="overview-stat">
-          <span class="overview-stat-number" id="avgTime">-</span>
-          <span class="overview-stat-label">Avg Time (min)</span>
-        </div>
+    <div id="content-area">
+      <div class="loading" id="loadingState">
+        <div class="loading-spinner"></div>
+        <p style="color: var(--text-secondary); font-size: 14px; font-weight: 600;">Loading articles...</p>
       </div>
-    </div>
-
-    <div id="loadingSection" class="loading" style="display: none;">
-      <div class="spinner"></div>
-      Loading quizzes...
-    </div>
-
-    <div id="errorSection" class="error" style="display: none;">
-      <h3>Error Loading Quizzes</h3>
-      <p id="errorMessage">Unable to load quiz data. Please try again later.</p>
-      <button class="quiz-button" onclick="loadQuizzes()" style="margin-top: 15px; max-width: 200px;">Retry</button>
-    </div>
-
-    <div class="concepts-grid" id="conceptsGrid" style="display: none;">
-      <!-- Quiz cards will be dynamically loaded here -->
     </div>
   </div>
 
   <script>
-   // const API_BASE_URL = 'http://localhost:5000/api';
-    let quizzesData = [];
-    let currentToken = '';
+  (function () {
 
-    function getDifficultyLevel(questions) {
-      if (questions <= 3) return 'beginner';
-      if (questions <= 7) return 'intermediate';
-      return 'advanced';
+    const API_BASE = '';
+
+    const contentArea = document.getElementById('content-area');
+    const searchInput = document.getElementById('searchInput');
+
+    let allTopics = [];
+
+    const params = new URLSearchParams(window.location.search);
+    const tutorialId = params.get('tutorial_id');
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
     }
 
-    function generateDescription(topic, questions) {
-      const descriptions = [
-        `Master the fundamentals of ${topic} with ${questions} comprehensive questions.`,
-        `Test your knowledge in ${topic} through ${questions} challenging questions.`,
-        `Enhance your understanding of ${topic} concepts with this ${questions}-question quiz.`,
-        `Evaluate your skills in ${topic} with ${questions} well-crafted questions.`
-      ];
-      return descriptions[Math.floor(Math.random() * descriptions.length)];
+    function getProgress(t) {
+      const raw = t.progress_percentage ?? t.progress ?? t.completion_percentage ?? t.completion ?? 0;
+      const n = Number(raw);
+      if (isNaN(n)) return 0;
+      return Math.min(100, Math.max(0, Math.round(n)));
     }
 
-    async function fetchQuizzes() {
-      if (!currentToken) {
-        throw new Error('Authentication token not found. Please log in.');
-      }
-
-      const response = await fetch(`${API_URL}/quizzes`, {
-        headers: {
-          'Authorization': `Bearer ${currentToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Invalid or expired token. Please log in again.');
-        } else if (response.status === 403) {
-          throw new Error('Access denied. You do not have permission to access this resource.');
-        } else {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-      }
-
-      const data = await response.json();
-
-      if (data.success && data.quizzes) {
-        return data.quizzes;
-      } else {
-        throw new Error('Invalid API response format');
-      }
+    function progressRing(pct) {
+      const radius = 20;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (pct / 100) * circumference;
+      return `
+        <div class="progress-ring-wrap" title="${pct}% complete">
+          <svg viewBox="0 0 46 46">
+            <circle class="progress-ring-bg" cx="23" cy="23" r="${radius}"></circle>
+            <circle class="progress-ring-fill" cx="23" cy="23" r="${radius}"
+              stroke-dasharray="${circumference}"
+              stroke-dashoffset="${offset}"></circle>
+          </svg>
+          <div class="progress-ring-label">${pct}%</div>
+        </div>
+      `;
     }
 
-    function displayError(message) {
-      document.getElementById('loadingSection').style.display = 'none';
-      document.getElementById('conceptsGrid').style.display = 'none';
-      document.getElementById('overviewSection').style.display = 'none';
-      document.getElementById('errorSection').style.display = 'block';
-      document.getElementById('errorMessage').textContent = message;
-      document.getElementById('noTokenMessage').style.display = 'none';
-    }
-
-    function updateOverviewStats(quizzes) {
-      const totalQuizzes = quizzes.length;
-      const totalQuestions = quizzes.reduce((sum, quiz) => sum + quiz.no_of_questions, 0);
-      const totalPoints = quizzes.reduce((sum, quiz) => sum + quiz.total_points, 0);
-      const avgTime = Math.round(quizzes.reduce((sum, quiz) => sum + quiz.time_seconds, 0) / quizzes.length / 60);
-
-      document.getElementById('totalQuizzes').textContent = totalQuizzes;
-      document.getElementById('totalQuestions').textContent = totalQuestions;
-      document.getElementById('totalPoints').textContent = totalPoints;
-      document.getElementById('avgTime').textContent = `${avgTime} min`;
-    }
-
-    function renderQuizCards(quizzes) {
-      const conceptsGrid = document.getElementById('conceptsGrid');
-      conceptsGrid.innerHTML = '';
-
-      quizzes.forEach((quiz, index) => {
-        const difficulty = getDifficultyLevel(quiz.no_of_questions);
-        const description = generateDescription(quiz.topic, quiz.no_of_questions);
-        const timeMinutes = Math.ceil(quiz.time_seconds / 60);
-
-        const quizCard = document.createElement('div');
-        quizCard.className = 'concept-card';
-        quizCard.style.animationDelay = `${(index + 1) * 0.1}s`;
-
-        quizCard.innerHTML = `
-          <div class="concept-header">
-            <h3 class="concept-title">${quiz.topic}</h3>
-            <span class="difficulty-badge difficulty-${difficulty}">${difficulty}</span>
-          </div>
-          <p class="concept-description">${description}</p>
-          <div class="quiz-stats">
-            <div class="stat-item">
-              <span class="stat-number">${timeMinutes}</span>
-              <span class="stat-label">Minutes</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-number">${quiz.no_of_questions}</span>
-              <span class="stat-label">Questions</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-number">${quiz.total_points}</span>
-              <span class="stat-label">Points</span>
-            </div>
-          </div>
-          <div class="quiz-stats">
-            <div class="stat-item">
-              <span class="stat-number">${quiz.points_per_question}</span>
-              <span class="stat-label">Points/Q</span>
-            </div>
-          </div>
-          <button class="quiz-button" onclick="startQuiz(${quiz.quiz_id}, '${quiz.topic}', ${index})">
-            Start Quiz
-          </button>
-        `;
-
-        conceptsGrid.appendChild(quizCard);
-      });
-    }
-
-    async function loadQuizzes() {
-      document.getElementById('errorSection').style.display = 'none';
-      document.getElementById('noTokenMessage').style.display = 'none';
-
-      currentToken = localStorage.getItem('authToken');
-      if (!currentToken) {
-        document.getElementById('noTokenMessage').style.display = 'block';
+    function renderTopics(list) {
+      if (list.length === 0) {
+        contentArea.innerHTML = `
+          <div class="no-data">
+            <div style="font-size: 42px; margin-bottom: 10px;">📖</div>
+            <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-primary);">No Matches</h3>
+            <p>No articles match your search.</p>
+          </div>`;
         return;
       }
 
-      document.getElementById('loadingSection').style.display = 'flex';
-      document.getElementById('conceptsGrid').style.display = 'none';
-      document.getElementById('overviewSection').style.display = 'none';
+      contentArea.innerHTML = `
+        <div class="topic-grid">
+          ${list.map((t) => {
+            const pct = getProgress(t);
+            return `
+            <div class="topic-card">
+              <div class="topic-card-header">
+                <div class="topic-icon">📖</div>
+                <div class="topic-text">
+                  <h3>${escapeHtml(t.title)}</h3>
+                  <div class="topic-type">Article &amp; Quiz</div>
+                </div>
+                <!-- ${progressRing(pct)} -->
+              </div>
 
+              <p class="topic-description">
+                ${escapeHtml(t.description || 'Read this article to understand the concept and strengthen your knowledge.')}
+              </p>
+
+              <div class="topic-footer">
+                <a class="topic-action" href="article.html?topic_id=${encodeURIComponent(t.topic_id)}">
+                  <span class="action-icon">📖</span>
+                  <span>Article</span>
+                </a>
+                <a class="topic-action" href="quizinterface.html?topic_id=${encodeURIComponent(t.topic_id)}">
+                  <span class="action-icon">📝</span>
+                  <span>Quiz</span>
+                </a>
+              </div>
+            </div>
+          `;
+          }).join('')}
+        </div>`;
+    }
+
+    function renderError(message, showBack) {
+      contentArea.innerHTML = `
+        <div class="error">
+          <h3 style="font-size: 18px; margin-bottom: 8px;">⚠️ Error</h3>
+          <p style="font-size: 13px;">${escapeHtml(message)}</p>
+          <button type="button" onclick="location.reload()">Retry</button>
+          ${showBack ? `<br><a class="back-link" href="tutorials.html">← Back to tutorials</a>` : ''}
+        </div>`;
+    }
+
+    async function loadTutorialInfo() {
       try {
-        quizzesData = await fetchQuizzes();
+        const res = await fetch(`${API_BASE}/api/tutorials/${encodeURIComponent(tutorialId)}`);
+        const data = await res.json();
 
-        if (quizzesData.length === 0) {
-          throw new Error('No quizzes available');
+        if (!res.ok || !data.success) {
+          document.getElementById('tutorialTitle').textContent = 'Tutorial not found';
+          document.getElementById('tutorialDescription').textContent = '';
+          return;
         }
 
-        updateOverviewStats(quizzesData);
-        renderQuizCards(quizzesData);
-
-        document.getElementById('loadingSection').style.display = 'none';
-        document.getElementById('overviewSection').style.display = 'block';
-        document.getElementById('conceptsGrid').style.display = 'grid';
-      } catch (error) {
-        displayError(error.message || 'Failed to load quizzes. Please check your connection and try again.');
+        const tutorial = data.tutorial;
+        document.getElementById('tutorialTitle').textContent = tutorial.title;
+        document.getElementById('tutorialDescription').textContent = tutorial.description || '';
+        document.getElementById('breadcrumbCurrent').textContent = ' / ' + tutorial.title;
+        document.title = `${tutorial.title} | Articles | Primary Key`;
+      } catch (err) {
+        console.error('Error loading tutorial info:', err);
+        document.getElementById('tutorialTitle').textContent = 'Articles';
       }
     }
 
-    function startQuiz(quizId, quizTopic, index) {
-      const quiz = quizzesData[index];
-      sessionStorage.setItem('currentQuiz', JSON.stringify(quiz));
-      sessionStorage.setItem('authToken', currentToken);
-      window.location.href = `quizinterface.html?quiz_id=${quizId}`;
+    async function loadTopics() {
+      try {
+        const res = await fetch(`${API_BASE}/api/topics/tutorial/${encodeURIComponent(tutorialId)}`);
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'Failed to load articles');
+        }
+
+        allTopics = data.topics || [];
+
+        if (allTopics.length === 0) {
+          contentArea.innerHTML = `
+            <div class="no-data">
+              <div style="font-size: 42px; margin-bottom: 10px;">📖</div>
+              <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-primary);">No Articles Yet</h3>
+              <p>No articles published yet for this tutorial.</p>
+              <a class="back-link" href="tutorials.html">← Back to tutorials</a>
+            </div>`;
+          return;
+        }
+
+        renderTopics(allTopics);
+      } catch (err) {
+        console.error('Error loading topics:', err);
+        renderError('Could not load articles. Please check your connection and try again.', true);
+      }
     }
 
-    window.addEventListener('DOMContentLoaded', loadQuizzes);
-  </script>
-</body>
+    // searchInput.addEventListener('input', function (e) {
+    //   const q = e.target.value.trim().toLowerCase();
+    //   const filtered = allTopics.filter(t =>
+    //     (t.title || '').toLowerCase().includes(q) ||
+    //     (t.description || '').toLowerCase().includes(q)
+    //   );
+    //   renderTopics(filtered);
+    // });
 
+    if (!tutorialId) {
+      document.getElementById('tutorialTitle').textContent = 'No tutorial selected';
+      contentArea.innerHTML = `
+        <div class="no-data">
+          <p>No tutorial was specified.</p>
+          <a class="back-link" href="tutorials.html">← Back to tutorials</a>
+        </div>`;
+    } else {
+      loadTutorialInfo();
+      loadTopics();
+    }
+
+  })();
+  </script>
+  <script src="../assets/sidebar.js"></script>
+</body>
 </html>

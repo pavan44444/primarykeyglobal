@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auth Portal</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>PRIMARY KEY</title>
     <style>
         * {
             margin: 0;
@@ -11,49 +12,55 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary-bg: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0d47a1 100%);
-            --secondary-bg: rgba(13, 71, 161, 0.1);
-            --glass-bg: rgba(26, 26, 46, 0.3);
-            --glass-border: rgba(13, 71, 161, 0.3);
+    :root {
+            --primary-bg: linear-gradient(135deg, #000000 0%, #0a0a0a 25%, #111111 50%, #0c1e35 75%, #0284c7 100%);
+            --secondary-bg: rgba(2, 132, 199, 0.1);
+            --glass-bg: rgba(10, 10, 10, 0.5);
+            --glass-border: rgba(2, 132, 199, 0.3);
             --text-primary: #ffffff;
             --text-secondary: rgba(255, 255, 255, 0.8);
             --text-muted: rgba(255, 255, 255, 0.6);
-            --input-bg: rgba(13, 71, 161, 0.15);
-            --input-border: rgba(13, 71, 161, 0.3);
-            --input-focus-bg: rgba(13, 71, 161, 0.25);
-            --input-focus-border: rgba(13, 71, 161, 0.6);
-            --btn-gradient: linear-gradient(135deg, #0d47a1, #1976d2);
-            --success-bg: rgba(13, 71, 161, 0.2);
-            --success-border: rgba(13, 71, 161, 0.4);
-            --success-text: #64b5f6;
+            --input-bg: rgba(2, 132, 199, 0.15);
+            --input-border: rgba(2, 132, 199, 0.3);
+            --input-focus-bg: rgba(2, 132, 199, 0.25);
+            --input-focus-border: rgba(2, 132, 199, 0.6);
+            --btn-gradient: linear-gradient(135deg, #0284c7, #0369a1);
+            --success-bg: rgba(2, 132, 199, 0.2);
+            --success-border: rgba(2, 132, 199, 0.4);
+            --success-text: #0ea5e9;
             --error-bg: rgba(211, 47, 47, 0.2);
             --error-border: rgba(211, 47, 47, 0.4);
             --error-text: #ef5350;
-            --shape-bg: rgba(13, 71, 161, 0.1);
+            --shape-bg: rgba(2, 132, 199, 0.1);
         }
+     [data-theme="light"] {
+    --primary-bg: linear-gradient(135deg, #ffffff 0%, #f0f9ff 25%, #e0f2fe 50%, #bae6fd 75%, #0284c7 100%);
+    --secondary-bg: rgba(2, 132, 199, 0.08);
 
-        [data-theme="light"] {
-            --primary-bg: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 25%, #90caf9 50%, #64b5f6 75%, #2196f3 100%);
-            --secondary-bg: rgba(33, 150, 243, 0.1);
-            --glass-bg: rgba(255, 255, 255, 0.4);
-            --glass-border: rgba(33, 150, 243, 0.3);
-            --text-primary: #1a1a2e;
-            --text-secondary: rgba(26, 26, 46, 0.8);
-            --text-muted: rgba(26, 26, 46, 0.6);
-            --input-bg: rgba(255, 255, 255, 0.6);
-            --input-border: rgba(33, 150, 243, 0.3);
-            --input-focus-bg: rgba(255, 255, 255, 0.8);
-            --input-focus-border: rgba(33, 150, 243, 0.6);
-            --btn-gradient: linear-gradient(135deg, #2196f3, #1976d2);
-            --success-bg: rgba(33, 150, 243, 0.15);
-            --success-border: rgba(33, 150, 243, 0.3);
-            --success-text: #1976d2;
-            --error-bg: rgba(211, 47, 47, 0.15);
-            --error-border: rgba(211, 47, 47, 0.3);
-            --error-text: #d32f2f;
-            --shape-bg: rgba(255, 255, 255, 0.2);
-        }
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(2, 132, 199, 0.25);
+
+    --text-primary: #0f172a; /* deep navy */
+    --text-secondary: rgba(15, 23, 42, 0.8);
+    --text-muted: rgba(15, 23, 42, 0.6);
+
+    --input-bg: rgba(255, 255, 255, 0.7);
+    --input-border: rgba(2, 132, 199, 0.28);
+    --input-focus-bg: rgba(255, 255, 255, 0.9);
+    --input-focus-border: rgba(2, 132, 199, 0.55);
+
+    --btn-gradient: linear-gradient(135deg, #0284c7, #0369a1);
+
+    --success-bg: rgba(2, 132, 199, 0.12);
+    --success-border: rgba(2, 132, 199, 0.3);
+    --success-text: #0369a1;
+
+    --error-bg: rgba(211, 47, 47, 0.15);
+    --error-border: rgba(211, 47, 47, 0.3);
+    --error-text: #d32f2f;
+
+    --shape-bg: rgba(255, 255, 255, 0.25);
+}
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -351,6 +358,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            z-index: 20;
         }
 
         .theme-toggle:hover {
@@ -421,16 +429,16 @@
                     <input type="password" class="form-input" placeholder="Password" id="registerPassword" required>
                 </div>
                 <div class="form-row">
-                    <div class="form-group">
-                        <input type="text" class="form-input" placeholder="College" id="registerCollege" required>
+                    <!-- <div class="form-group">
+                        <input type="text" class="form-input" placeholder="College Short name" id="registerCollege" required>
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-input" placeholder="City" id="registerCity" required>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="role-selector">
-                    <div class="role-option active" data-role="user">User</div>
-                    <div class="role-option" data-role="admin">Admin</div>
+<!--                     <div class="role-option active" data-role="user">User</div>
+                    <div class="role-option" data-role="admin">Admin</div> -->
                 </div>
                 <button type="submit" class="btn" id="registerBtn">
                     <span class="btn-text">Create Account</span>
@@ -445,240 +453,302 @@
     </div>
 
     <script>
-        class AuthPage {
-            constructor() {
-                this.isLogin = true;
-                this.selectedRole = 'user';
-                this.theme = localStorage.getItem('theme') || 'dark';
-                this.initializeTheme();
-                this.initializeElements();
-                this.bindEvents();
-            }
+       const API_BASE_URL = "http://localhost:5000/";
+       //const API_BASE_URL = "https://primarykey-production-6114.up.railway.app/";
+        
+        // Initialize theme early
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
 
-            initializeTheme() {
-                document.documentElement.setAttribute('data-theme', this.theme);
-                const themeIcon = document.getElementById('themeIcon');
-                if (themeIcon) {
-                    themeIcon.textContent = this.theme === 'dark' ? '☀️' : '🌙';
-                }
-            }
-
-            initializeElements() {
-                this.loginForm = document.getElementById('loginForm');
-                this.registerForm = document.getElementById('registerForm');
-                this.toggleLink = document.getElementById('toggleLink');
-                this.authTitle = document.getElementById('authTitle');
-                this.authSubtitle = document.getElementById('authSubtitle');
-                this.message = document.getElementById('message');
-                this.roleOptions = document.querySelectorAll('.role-option');
-                this.themeToggle = document.getElementById('themeToggle');
-            }
-
-            bindEvents() {
-                this.toggleLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleForm();
-                });
-
-                this.themeToggle.addEventListener('click', () => {
-                    this.toggleTheme();
-                });
-
-                this.loginForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    this.handleLogin();
-                });
-
-                this.registerForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    this.handleRegister();
-                });
-
-                this.roleOptions.forEach(option => {
-                    option.addEventListener('click', () => {
-                        this.selectRole(option.dataset.role);
-                    });
-                });
-
-                // Add input animations
-                document.querySelectorAll('.form-input').forEach(input => {
-                    input.addEventListener('focus', this.handleInputFocus);
-                    input.addEventListener('blur', this.handleInputBlur);
-                });
-            }
-
-            toggleTheme() {
-                this.theme = this.theme === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', this.theme);
-                localStorage.setItem('theme', this.theme);
-                
-                const themeIcon = document.getElementById('themeIcon');
-                themeIcon.textContent = this.theme === 'dark' ? '☀️' : '🌙';
-            }
-
-            toggleForm() {
-                this.isLogin = !this.isLogin;
-                
-                if (this.isLogin) {
-                    this.loginForm.classList.add('active');
-                    this.registerForm.classList.remove('active');
-                    this.authTitle.textContent = 'Welcome Back';
-                    this.authSubtitle.textContent = 'Sign in to your account';
-                    this.toggleLink.textContent = "Don't have an account? Sign up";
-                } else {
-                    this.registerForm.classList.add('active');
-                    this.loginForm.classList.remove('active');
-                    this.authTitle.textContent = 'Create Account';
-                    this.authSubtitle.textContent = 'Join us today';
-                    this.toggleLink.textContent = 'Already have an account? Sign in';
-                }
-
-                this.hideMessage();
-            }
-
-            selectRole(role) {
-                this.selectedRole = role;
-                this.roleOptions.forEach(option => {
-                    option.classList.toggle('active', option.dataset.role === role);
-                });
-            }
-
-            handleInputFocus(e) {
-                e.target.style.transform = 'scale(1.02)';
-            }
-
-            handleInputBlur(e) {
-                e.target.style.transform = 'scale(1)';
-            }
-
-            async handleLogin() {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-
-                if (!email || !password) {
-                    this.showMessage('Please fill in all fields', 'error');
-                    return;
-                }
-
-                this.setLoading(true, 'login');
-
-                try {
-                    const response = await fetch('${API_URL}/auth/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email, password })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-    // Store the token in localStorage
-    localStorage.setItem('authToken', data.token);
-    
-    window.location.href = "../dashboard/dashboard.html";
-    console.log('Login successful:', data);
-} else {
-                        this.showMessage(data.message || 'Login failed', 'error');
-                    }
-                } catch (error) {
-                    this.showMessage('Network error. Please try again.', 'error');
-                    console.error('Login error:', error);
-                } finally {
-                    this.setLoading(false, 'login');
-                }
-            }
-
-            async handleRegister() {
-                const name = document.getElementById('registerName').value;
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                const college = document.getElementById('registerCollege').value;
-                const city = document.getElementById('registerCity').value;
-
-                if (!name || !email || !password || !college || !city) {
-                    this.showMessage('Please fill in all fields', 'error');
-                    return;
-                }
-
-                if (password.length < 6) {
-                    this.showMessage('Password must be at least 6 characters', 'error');
-                    return;
-                }
-
-                this.setLoading(true, 'register');
-
-                try {
-                    const response = await fetch('${API_URL}/auth/register', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            name,
-                            email,
-                            password,
-                            college,
-                            city,
-                            role: this.selectedRole
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        this.showMessage('Account created successfully! You can now sign in.', 'success');
-                        setTimeout(() => {
-                            this.toggleForm();
-                            document.getElementById('loginEmail').value = email;
-                        }, 2000);
-                    } else {
-                        this.showMessage(data.message || 'Registration failed', 'error');
-                    }
-                } catch (error) {
-                    this.showMessage('Network error. Please try again.', 'error');
-                    console.error('Registration error:', error);
-                } finally {
-                    this.setLoading(false, 'register');
-                }
-            }
-
-            setLoading(loading, form) {
-                const btn = document.getElementById(`${form}Btn`);
-                const btnText = btn.querySelector('.btn-text');
-                const loadingSpinner = document.getElementById(`${form}Loading`);
-
-                if (loading) {
-                    btn.disabled = true;
-                    btnText.style.display = 'none';
-                    loadingSpinner.style.display = 'block';
-                } else {
-                    btn.disabled = false;
-                    btnText.style.display = 'inline';
-                    loadingSpinner.style.display = 'none';
-                }
-            }
-
-            showMessage(text, type) {
-                this.message.textContent = text;
-                this.message.className = `message ${type}`;
-                this.message.style.display = 'block';
-
-                if (type === 'success') {
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            class AuthPage {
+                constructor() {
+                    this.isLogin = true;
+                    this.selectedRole = 'user';
+                    this.theme = localStorage.getItem('theme') || 'dark';
+                    
+                    // Initialize everything after DOM is ready
                     setTimeout(() => {
-                        this.hideMessage();
-                    }, 3000);
+                        this.initializeTheme();
+                        this.initializeElements();
+                        this.bindEvents();
+                    }, 100);
                 }
+
+                initializeTheme() {
+                    document.documentElement.setAttribute('data-theme', this.theme);
+                    const themeIcon = document.getElementById('themeIcon');
+                    if (themeIcon) {
+                        themeIcon.textContent = this.theme === 'dark' ? '🌙' : '☀️';
+                    }
+                }
+
+                initializeElements() {
+                    this.loginForm = document.getElementById('loginForm');
+                    this.registerForm = document.getElementById('registerForm');
+                    this.toggleLink = document.getElementById('toggleLink');
+                    this.authTitle = document.getElementById('authTitle');
+                    this.authSubtitle = document.getElementById('authSubtitle');
+                    this.message = document.getElementById('message');
+                    this.roleOptions = document.querySelectorAll('.role-option');
+                    this.themeToggle = document.getElementById('themeToggle');
+                    
+                    console.log('Elements initialized:', {
+                        loginForm: !!this.loginForm,
+                        registerForm: !!this.registerForm,
+                        themeToggle: !!this.themeToggle
+                    });
+                }
+
+                bindEvents() {
+                    // Theme toggle
+                    if (this.themeToggle) {
+                        this.themeToggle.addEventListener('click', () => {
+                            this.toggleTheme();
+                        });
+                    }
+
+                    // Form toggle
+                    if (this.toggleLink) {
+                        this.toggleLink.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            this.toggleForm();
+                        });
+                    }
+
+                    // Login form
+                    if (this.loginForm) {
+                        this.loginForm.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            this.handleLogin();
+                        });
+                    }
+
+                    // Register form
+                    if (this.registerForm) {
+                        this.registerForm.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            this.handleRegister();
+                        });
+                    }
+
+                    // Role selection
+                    this.roleOptions.forEach(option => {
+                        option.addEventListener('click', () => {
+                            this.selectRole(option.dataset.role);
+                        });
+                    });
+
+                    // Input animations
+                    document.querySelectorAll('.form-input').forEach(input => {
+                        input.addEventListener('focus', (e) => {
+                            e.target.style.transform = 'scale(1.02)';
+                        });
+                        input.addEventListener('blur', (e) => {
+                            e.target.style.transform = 'scale(1)';
+                        });
+                    });
+
+                    console.log('Events bound successfully');
+                }
+
+                toggleTheme() {
+                    this.theme = this.theme === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', this.theme);
+                    localStorage.setItem('theme', this.theme);
+                    
+                    const themeIcon = document.getElementById('themeIcon');
+                    if (themeIcon) {
+                        themeIcon.textContent = this.theme === 'dark' ? '🌙' : '☀️';
+                    }
+                    
+                    console.log('Theme changed to:', this.theme);
+                }
+
+                toggleForm() {
+                    this.isLogin = !this.isLogin;
+                    
+                    if (this.isLogin) {
+                        if (this.loginForm) this.loginForm.classList.add('active');
+                        if (this.registerForm) this.registerForm.classList.remove('active');
+                        if (this.authTitle) this.authTitle.textContent = 'Welcome Back';
+                        if (this.authSubtitle) this.authSubtitle.textContent = 'Sign in to your account';
+              //          if (this.toggleLink) this.toggleLink.textContent = "Don't have an account? Sign up";
+                    } else {
+                        if (this.registerForm) this.registerForm.classList.add('active');
+                        if (this.loginForm) this.loginForm.classList.remove('active');
+                        if (this.authTitle) this.authTitle.textContent = 'Create Account';
+                        if (this.authSubtitle) this.authSubtitle.textContent = 'Join us today';
+                        if (this.toggleLink) this.toggleLink.textContent = 'Already have an account? Sign in';
+                    }
+
+                    this.hideMessage();
+                }
+
+                selectRole(role) {
+                    this.selectedRole = role;
+                    this.roleOptions.forEach(option => {
+                        option.classList.toggle('active', option.dataset.role === role);
+                    });
+                }
+async handleLogin() {
+    const email = document.getElementById('loginEmail')?.value;
+    const password = document.getElementById('loginPassword')?.value;
+
+    if (!email || !password) {
+        this.showMessage('Please fill in all fields', 'error');
+        return;
+    }
+
+    this.setLoading(true, 'login');
+
+    try {
+        const response = await fetch(`${API_BASE_URL}api/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('userRole', data.user.role); // ✅ store role
+            localStorage.setItem('college_id', data.user.college_id);
+
+            if (data.user.role === 'admin') {
+                window.location.href = "../admindashboard/admindashboard.html";
+            } else {
+                window.location.href = "../dashboard/dashboard.html";
             }
 
-            hideMessage() {
-                this.message.style.display = 'none';
-            }
+            console.log('Login successful:', data);
+        } else {
+            // ✅ This was missing — now failed logins actually show an error
+            this.showMessage(data.message || 'Invalid email or password', 'error');
+            console.error('Login failed:', data);
         }
 
-        // Initialize the auth page
-        new AuthPage();
+    } catch (error) {
+        this.showMessage('Network error. Please try again.', 'error');
+        console.error('Login error:', error);
+    } finally {
+        this.setLoading(false, 'login');
+    }
+}
+               async handleRegister() {
+                    const name = document.getElementById('registerName')?.value;
+                    const email = document.getElementById('registerEmail')?.value;
+                    const password = document.getElementById('registerPassword')?.value;
+                    const college = document.getElementById('registerCollege')?.value;
+                    const city = document.getElementById('registerCity')?.value;
+
+                    if (!name || !email || !password) {
+                        this.showMessage('Please fill in all fields', 'error');
+                        return;
+                    }
+
+                    if (password.length < 6) {
+                        this.showMessage('Password must be at least 6 characters', 'error');
+                        return;
+                    }
+
+                    this.setLoading(true, 'register');
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}api/auth/register`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                name,
+                                email,
+                                password,
+                                college,
+                                city,
+                                role: this.selectedRole
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            this.showMessage('Account created successfully! You can now sign in.', 'success');
+                            setTimeout(() => {
+                                this.toggleForm();
+                                const loginEmailField = document.getElementById('loginEmail');
+                                if (loginEmailField) loginEmailField.value = email;
+                            }, 2000);
+                        } else {
+                            this.showMessage(data.message || 'Registration failed', 'error');
+                        }
+                    } catch (error) {
+                        this.showMessage('Network error. Please try again.', 'error');
+                        console.error('Registration error:', error);
+                    } finally {
+                        this.setLoading(false, 'register');
+                    }
+                }
+
+                setLoading(loading, form) {
+                    const btn = document.getElementById(`${form}Btn`);
+                    const btnText = btn?.querySelector('.btn-text');
+                    const loadingSpinner = document.getElementById(`${form}Loading`);
+
+                    if (loading) {
+                        if (btn) btn.disabled = true;
+                        if (btnText) btnText.style.display = 'none';
+                        if (loadingSpinner) loadingSpinner.style.display = 'block';
+                    } else {
+                        if (btn) btn.disabled = false;
+                        if (btnText) btnText.style.display = 'inline';
+                        if (loadingSpinner) loadingSpinner.style.display = 'none';
+                    }
+                }
+
+                showMessage(text, type) {
+                    if (this.message) {
+                        this.message.textContent = text;
+                        this.message.className = `message ${type}`;
+                        this.message.style.display = 'block';
+
+                        if (type === 'success') {
+                            setTimeout(() => {
+                                this.hideMessage();
+                            }, 3000);
+                        }
+                    }
+                }
+
+                hideMessage() {
+                    if (this.message) {
+                        this.message.style.display = 'none';
+                    }
+                }
+            }
+
+            // Initialize the auth page
+            new AuthPage();
+        });
     </script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5W8FHWS210"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-5W8FHWS210');
+    </script>
+   <iframe src="../report.html" 
+  style="position: fixed; bottom: 20px; right: 20px; 
+         width: 320px; height: 250px; border: none; 
+         z-index: 9999; overflow: visible; background: transparent;">
+</iframe>
 </body>
-</html> 
+</html>

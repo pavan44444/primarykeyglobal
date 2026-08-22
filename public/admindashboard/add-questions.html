@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Questions to Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0d47a1 100%);
+            --glass-bg: rgba(26, 26, 46, 0.3);
+            --glass-border: rgba(13, 71, 161, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --input-bg: rgba(13, 71, 161, 0.15);
+            --input-border: rgba(13, 71, 161, 0.3);
+            --input-focus-bg: rgba(13, 71, 161, 0.25);
+            --input-focus-border: rgba(13, 71, 161, 0.6);
+            --btn-gradient: linear-gradient(135deg, #0d47a1, #1976d2);
+            --success-bg: rgba(13, 71, 161, 0.2);
+            --success-border: rgba(13, 71, 161, 0.4);
+            --success-text: #64b5f6;
+            --error-bg: rgba(211, 47, 47, 0.2);
+            --error-border: rgba(211, 47, 47, 0.4);
+            --error-text: #ef5350;
+            --card-bg: rgba(26, 26, 46, 0.4);
+            --card-border: rgba(13, 71, 161, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--primary-bg);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .quiz-info {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .quiz-detail {
+            text-align: center;
+        }
+
+        .quiz-detail-label {
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .quiz-detail-value {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .upload-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--input-border);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--input-focus-border);
+            background: var(--input-bg);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--success-text);
+            background: var(--success-bg);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .csv-format {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .format-title {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .format-example {
+            background: var(--input-bg);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .format-notes {
+            margin-top: 12px;
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .format-notes ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--btn-gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.success {
+            background: var(--success-bg);
+            border: 1px solid var(--success-border);
+            color: var(--success-text);
+            display: block;
+        }
+
+        .message.error {
+            background: var(--error-bg);
+            border: 1px solid var(--error-border);
+            color: var(--error-text);
+            display: block;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 20;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--input-bg);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--btn-gradient);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        #csvFile {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .format-example {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="javascript:history.back()" class="back-btn">
+        <span>←</span>
+    </a>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Add Questions to Quiz</h1>
+            <p class="subtitle">Upload CSV file with questions for your quiz</p>
+        </div>
+
+        <div class="quiz-info" id="quizInfo">
+            <div class="quiz-detail">
+                <div class="quiz-detail-label">Quiz Topic</div>
+                <div class="quiz-detail-value" id="quizTopic">Loading...</div>
+            </div>
+            <div class="quiz-detail">
+                <div class="quiz-detail-label">Topic ID</div>
+                <div class="quiz-detail-value" id="topicId">-</div>
+            </div>
+            <div class="quiz-detail">
+                <div class="quiz-detail-label">Total Questions</div>
+                <div class="quiz-detail-value" id="totalQuestions">-</div>
+            </div>
+            <div class="quiz-detail">
+                <div class="quiz-detail-label">Points Each</div>
+                <div class="quiz-detail-value" id="pointsPerQuestion">-</div>
+            </div>
+        </div>
+
+        <div class="upload-section">
+            <div id="message" class="message"></div>
+            
+            <div class="csv-format">
+                <div class="format-title">📋 CSV Format Requirements</div>
+                <div class="format-example">What is the capital of France?,London,Berlin,Paris,Madrid,3
+Which planet is closest to the Sun?,Venus,Mercury,Earth,Mars,2</div>
+                <div class="format-notes">
+                    <strong>Important Notes:</strong>
+                    <ul>
+                        <li><strong>NO HEADER ROW</strong> - Start directly with question data</li>
+                        <li>CSV must have exactly 6 columns: question_text,option1,option2,option3,option4,correct_option</li>
+                        <li>correct_option must be 1, 2, 3, or 4 (corresponding to option1, option2, option3, option4)</li>
+                        <li>All fields are required - no empty cells allowed</li>
+                        <li>No commas inside question text or options (use semicolons if needed)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="file-upload-area" onclick="document.getElementById('csvFile').click()">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Click to select CSV file or drag and drop</div>
+                <div class="upload-hint">Maximum file size: 5MB</div>
+            </div>
+            
+            <input type="file" id="csvFile" accept=".csv" />
+            
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <button class="btn" id="uploadBtn" disabled>Upload Questions</button>
+        </div>
+    </div>
+
+    <script>
+      //  const API_BASE_URL = "http://localhost:5000/";
+      const API_BASE_URL = "https://primarykey-production-6114.up.railway.app/";
+        let currentQuizData = null;
+
+        // Get quiz data from previous page or URL parameters
+        function getQuizData() {
+            // First try to get from window object (if coming from same session)
+            if (window.currentQuizData) {
+                return window.currentQuizData;
+            }
+            
+            // Try to get from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('quiz_id')) {
+                return {
+                    quiz_id: urlParams.get('quiz_id'),
+                    topic: urlParams.get('topic'),
+                    topic_id: urlParams.get('topic_id'),
+                    no_of_questions: urlParams.get('no_of_questions'),
+                    points_per_question: urlParams.get('points_per_question')
+                };
+            }
+            
+            // No data available
+            return null;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            currentQuizData = getQuizData();
+            
+            if (currentQuizData) {
+                // Populate quiz info
+                document.getElementById('quizTopic').textContent = currentQuizData.topic;
+                document.getElementById('topicId').textContent = currentQuizData.topic_id;
+                document.getElementById('totalQuestions').textContent = currentQuizData.no_of_questions;
+                document.getElementById('pointsPerQuestion').textContent = currentQuizData.points_per_question;
+            } else {
+                // Show error if no quiz data
+                showMessage('No quiz data found. Please create a quiz first.', 'error');
+                document.getElementById('quizInfo').style.display = 'none';
+            }
+        });
+
+        // File upload handling
+        const fileUploadArea = document.querySelector('.file-upload-area');
+        const csvFile = document.getElementById('csvFile');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].name.toLowerCase().endsWith('.csv')) {
+                csvFile.files = files;
+                updateFileName();
+            } else {
+                showMessage('Please upload a valid CSV file.', 'error');
+            }
+        });
+
+        csvFile.addEventListener('change', updateFileName);
+
+        function updateFileName() {
+            const fileName = csvFile.files[0]?.name;
+            if (fileName) {
+                document.querySelector('.upload-text').textContent = `Selected: ${fileName}`;
+                uploadBtn.disabled = false;
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = message;
+            messageEl.className = `message ${type}`;
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 8000);
+        }
+
+        function showProgress(percentage) {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (percentage > 0) {
+                progressBar.style.display = 'block';
+                progressFill.style.width = percentage + '%';
+            } else {
+                progressBar.style.display = 'none';
+            }
+        }
+
+        // Upload questions
+        uploadBtn.addEventListener('click', async () => {
+            const file = csvFile.files[0];
+            
+            if (!file) {
+                showMessage('Please select a CSV file first.', 'error');
+                return;
+            }
+
+            if (!currentQuizData || !currentQuizData.quiz_id) {
+                showMessage('Quiz ID not found. Please create a quiz first.', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('csvFile', file);
+            if (currentQuizData.topic_id) {
+                formData.append('topic_id', currentQuizData.topic_id);
+            }
+
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+            showProgress(10);
+
+            try {
+                const authToken = localStorage.getItem("authToken");
+                console.log('Auth token exists:', !!authToken);
+                console.log('Quiz ID:', currentQuizData.quiz_id);
+                console.log('File:', file.name, 'Size:', file.size);
+
+                const response = await fetch(`${API_BASE_URL}api/quizzes/${currentQuizData.quiz_id}/questions/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken || ''}`
+                    },
+                    body: formData
+                });
+
+                showProgress(90);
+
+                const data = await response.json();
+                
+                showProgress(100);
+                setTimeout(() => showProgress(0), 1000);
+
+                if (response.ok && data.success) {
+                    showMessage(`Success! ${data.questionsAdded} questions added to the quiz.`, 'success');
+                    csvFile.value = '';
+                    document.querySelector('.upload-text').textContent = 'Click to select CSV file or drag and drop';
+                } else {
+                    let errorMessage = data.message || 'Upload failed';
+                    if (data.errors && data.errors.length > 0) {
+                        errorMessage += '\n\nDetailed Errors:\n' + data.errors.join('\n');
+                    }
+                    console.error('Server response:', data);
+                    console.error('Response status:', response.status);
+                    showMessage(errorMessage, 'error');
+                }
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showMessage('Network error. Please try again.', 'error');
+                showProgress(0);
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Upload Questions';
+            }
+        });
+    </script>
+</body>
+</html>

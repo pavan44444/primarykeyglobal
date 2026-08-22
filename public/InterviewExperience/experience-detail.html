@@ -1,187 +1,637 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Interview Experiences</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 10px;
-      background: #f9fafb;
-      color: #2c3e50;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    #errorMessage {
-      color: red;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    .card {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-      padding: 15px 20px;
-      margin-bottom: 15px;
-      cursor: pointer;
-      transition: box-shadow 0.3s ease;
-      overflow: hidden;
-      max-height: 100px;
-      position: relative;
-    }
-    .card:hover {
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    .card.expanded {
-      max-height: 1000px; /* big enough to show content */
-      cursor: default;
-    }
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-    .card-header > div {
-      margin: 5px 0;
-    }
-    .card-details {
-      margin-top: 15px;
-      font-weight: normal;
-      font-size: 0.95rem;
-      color: #444;
-      display: none;
-    }
-    .card.expanded .card-details {
-      display: block;
-    }
-    .rounds {
-      margin-top: 12px;
-      padding-left: 15px;
-      border-left: 2px solid #3498db;
-    }
-    .round {
-      margin-bottom: 10px;
-    }
-    .round strong {
-      display: block;
-      color: #2980b9;
-      margin-bottom: 3px;
-    }
-    .round p {
-      margin: 0 0 5px 0;
-    }
-  </style>
+    <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Experience Detail - PRIMARY KEY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/theme.css">
+    <link rel="stylesheet" href="../assets/sidebar.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 90px;
+            left: 20px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 8px 24px rgba(2, 132, 199, 0.4);
+            border-color: #0284c7;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 32px 60px;
+        }
+
+        .hero-header {
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 20px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0284c7, #0ea5e9, #06b6d4);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .student-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 18px;
+            border-radius: 12px;
+            background: var(--btn-gradient);
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .student-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .date-badge {
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: rgba(2, 132, 199, 0.15);
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .company-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(28px, 5vw, 40px);
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #0284c7, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .company-icon {
+            font-size: 32px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-box {
+            padding: 16px;
+            border-radius: 12px;
+            background: rgba(2, 132, 199, 0.1);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-3px);
+            background: rgba(2, 132, 199, 0.15);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .package-value {
+            color: #10b981;
+            font-size: 20px;
+        }
+
+        .summary-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: 20px;
+            animation: fadeInUp 0.6s ease 0.2s backwards;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .section-icon {
+            font-size: 24px;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .summary-content {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            padding: 16px;
+            background: rgba(2, 132, 199, 0.08);
+            border-radius: 12px;
+            border-left: 3px solid #0284c7;
+        }
+
+        .rounds-section {
+            padding: 25px;
+            border-radius: 20px;
+            animation: fadeInUp 0.6s ease 0.3s backwards;
+        }
+
+        .rounds-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .rounds-count {
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: var(--btn-gradient);
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        /* Accordion Style for Rounds */
+        .rounds-accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .round-item {
+            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .round-item.active {
+            border-color: #0284c7;
+            box-shadow: 0 4px 20px rgba(2, 132, 199, 0.2);
+        }
+
+        .round-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 15px;
+        }
+
+        .round-header:hover {
+            background: rgba(2, 132, 199, 0.08);
+        }
+
+        .round-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .round-number-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--btn-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .round-info {
+            flex: 1;
+        }
+
+        .round-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .round-date-tag {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .round-toggle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(2, 132, 199, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .round-toggle-icon {
+            transition: transform 0.3s ease;
+            font-size: 14px;
+        }
+
+        .round-item.active .round-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .round-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .round-item.active .round-content {
+            max-height: 500px;
+            padding: 0 20px 20px 20px;
+        }
+
+        .round-description {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            padding: 16px;
+            background: rgba(2, 132, 199, 0.05);
+            border-radius: 10px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .no-data-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .error-message {
+            background: var(--error-bg);
+            border: 2px solid var(--error-border);
+            color: var(--error-text);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .error-message h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--glass-border);
+            border-top: 4px solid #0284c7;
+            border-radius: 50%;
+            display: inline-block;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .back-btn {
+                top: 80px;
+                left: 10px;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .hero-header,
+            .summary-section,
+            .rounds-section {
+                padding: 20px;
+            }
+
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .company-title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .round-header {
+                padding: 14px 16px;
+            }
+
+            .round-left {
+                gap: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <a href="view-experiences.html" class="back-btn glass">
+        <span>←</span>
+        <span>Back to Experiences</span>
+    </a>
 
-  <h1>Interview Experiences by College</h1>
+    <div class="container">
+        <div id="experienceContent">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p style="color: var(--text-secondary); font-size: 16px; font-weight: 600; margin-top: 10px;">Loading experience details...</p>
+            </div>
+        </div>
+    </div>
 
-  <div id="errorMessage"></div>
-
-  <div id="experiencesContainer"></div>
-
-  <script>
-    const API_URL = '${API_URL}/interviews/college';
-    const experiencesContainer = document.getElementById('experiencesContainer');
-    const errorMessage = document.getElementById('errorMessage');
-
-    async function loadExperiences() {
-      errorMessage.textContent = '';
-      experiencesContainer.innerHTML = '';
-
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        errorMessage.textContent = 'Authentication token not found. Please login first.';
-        return;
-      }
-
-      try {
-        const response = await fetch(API_URL, {
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-          }
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadExperienceDetail();
         });
 
-        if (!response.ok) {
-          if (response.status === 401) {
-            throw new Error('Unauthorized: Invalid or expired token.');
-          } else {
-            throw new Error('Failed to fetch data. Status: ' + response.status);
-          }
+        function loadExperienceDetail() {
+            const experienceData = sessionStorage.getItem('selectedExperience');
+            const contentContainer = document.getElementById('experienceContent');
+
+            if (!experienceData) {
+                contentContainer.innerHTML = `
+                    <div class="error-message glass">
+                        <h3>🔍 No Experience Data Found</h3>
+                        <p>The experience details could not be loaded. Please go back and select an experience again.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const experience = JSON.parse(experienceData);
+                renderExperienceDetail(experience);
+            } catch (error) {
+                contentContainer.innerHTML = `
+                    <div class="error-message glass">
+                        <h3>⚠️ Error Loading Experience</h3>
+                        <p>There was an error parsing the experience data. Please try again.</p>
+                    </div>
+                `;
+            }
         }
 
-        const experiences = await response.json();
+        function renderExperienceDetail(exp) {
+            const contentContainer = document.getElementById('experienceContent');
+            const initials = exp.student_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            
+            contentContainer.innerHTML = `
+                <div class="hero-header glass">
+                    <div class="header-top">
+                        <div class="student-badge">
+                            <div class="student-avatar">${initials}</div>
+                            <div>
+                                <div style="font-size: 11px; opacity: 0.9;">Shared by</div>
+                                <div style="font-size: 14px;">${exp.student_name}</div>
+                            </div>
+                        </div>
+                        <div class="date-badge">
+                            📅 ${new Date(exp.created_at).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                            })}
+                        </div>
+                    </div>
 
-        if (!Array.isArray(experiences) || experiences.length === 0) {
-          experiencesContainer.innerHTML = '<p>No interview experiences found.</p>';
-          return;
-        }
+                    <div class="company-title">
+                        <div class="company-icon">🏢</div>
+                        ${exp.company_name}
+                    </div>
 
-        experiences.forEach(exp => {
-          const card = document.createElement('div');
-          card.classList.add('card');
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">💼 Job Role</div>
+                            <div class="stat-value">${exp.job_role}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">📍 Location</div>
+                            <div class="stat-value">${exp.job_location}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">💰 Package</div>
+                            <div class="stat-value package-value">₹${parseFloat(exp.package_offered).toLocaleString()} LPA</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">🎯 Rounds</div>
+                            <div class="stat-value">${exp.rounds ? exp.rounds.length : 0}</div>
+                        </div>
+                    </div>
+                </div>
 
-          // Header info shown on collapsed card
-          card.innerHTML = `
-            <div class="card-header">
-              <div><strong>Student:</strong> ${exp.student_name}</div>
-              <div><strong>Company:</strong> ${exp.company_name}</div>
-              <div><strong>Date Submitted:</strong> ${new Date(exp.created_at).toLocaleDateString()}</div>
-              <div><strong>Rounds:</strong> ${exp.rounds ? exp.rounds.length : 0}</div>
-              <div><strong>Package:</strong> ₹${parseFloat(exp.package_offered).toLocaleString()}</div>
-            </div>
-            <div class="card-details">
-              <p><strong>Job Role:</strong> ${exp.job_role}</p>
-              <p><strong>Location:</strong> ${exp.job_location}</p>
-              <p><strong>Experience Summary:</strong> ${exp.experience_summary}</p>
-              <div class="rounds">
-                <h4>Interview Rounds:</h4>
-              </div>
-            </div>
-          `;
+                ${exp.experience_summary ? `
+                <div class="summary-section glass">
+                    <div class="section-header">
+                        <div class="section-icon">📝</div>
+                        <div class="section-title">Experience Summary</div>
+                    </div>
+                    <div class="summary-content">
+                        ${exp.experience_summary}
+                    </div>
+                </div>
+                ` : ''}
 
-          // Add rounds details inside rounds div
-          const roundsDiv = card.querySelector('.rounds');
-          if (exp.rounds && exp.rounds.length > 0) {
-            exp.rounds.forEach(round => {
-              const roundDiv = document.createElement('div');
-              roundDiv.classList.add('round');
-              roundDiv.innerHTML = `
-                <strong>Round ${round.round_number}: ${round.round_type}</strong>
-                <p>${round.round_description}</p>
-                <p><em>Date: ${new Date(round.round_date).toLocaleDateString()}</em></p>
-              `;
-              roundsDiv.appendChild(roundDiv);
+                <div class="rounds-section glass">
+                    <div class="rounds-header">
+                        <div class="section-header" style="margin: 0;">
+                            <div class="section-icon">🎯</div>
+                            <div class="section-title">Interview Rounds</div>
+                        </div>
+                        <div class="rounds-count">
+                            ${exp.rounds && exp.rounds.length > 0 ? exp.rounds.length : 0} Round${exp.rounds && exp.rounds.length !== 1 ? 's' : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="rounds-accordion">
+                        ${renderRounds(exp.rounds)}
+                    </div>
+                </div>
+            `;
+
+            // Add click handlers for accordion
+            document.querySelectorAll('.round-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const roundItem = this.parentElement;
+                    const isActive = roundItem.classList.contains('active');
+                    
+                    // Close all rounds
+                    document.querySelectorAll('.round-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // Open clicked round if it wasn't active
+                    if (!isActive) {
+                        roundItem.classList.add('active');
+                    }
+                });
             });
-          } else {
-            roundsDiv.innerHTML += '<p>No interview rounds details available.</p>';
-          }
+        }
 
-          // Toggle expand/collapse on click
-          card.addEventListener('click', () => {
-            card.classList.toggle('expanded');
-          });
+        function renderRounds(rounds) {
+            if (!rounds || rounds.length === 0) {
+                return `
+                    <div class="no-data">
+                        <div class="no-data-icon">📋</div>
+                        <p style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">No Interview Rounds Details</p>
+                        <p>No details available for interview rounds.</p>
+                    </div>
+                `;
+            }
 
-          experiencesContainer.appendChild(card);
-        });
-
-      } catch (err) {
-        errorMessage.textContent = err.message;
-      }
-    }
-
-    // Load experiences on page load
-    window.onload = loadExperiences;
-  </script>
-
+            return rounds.map((round, index) => `
+                <div class="round-item ${index === 0 ? 'active' : ''}">
+                    <div class="round-header">
+                        <div class="round-left">
+                            <div class="round-number-badge">${round.round_number}</div>
+                            <div class="round-info">
+                                <div class="round-title">${round.round_type}</div>
+                                <div class="round-date-tag">
+                                    📅 ${new Date(round.round_date).toLocaleDateString('en-US', { 
+                                        month: 'short', 
+                                        day: 'numeric', 
+                                        year: 'numeric' 
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="round-toggle">
+                            <span class="round-toggle-icon">▼</span>
+                        </div>
+                    </div>
+                    <div class="round-content">
+                        <div class="round-description">
+                            ${round.round_description || 'No description provided for this round.'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+    <script src="../assets/sidebar.js"></script>
 </body>
 </html>

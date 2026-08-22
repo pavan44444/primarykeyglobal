@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Announcements</title>
+  <link rel="icon" type="image/png" href="../../logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/theme.css">
+  <link rel="stylesheet" href="../assets/sidebar.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 32px 80px;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      color: var(--text-primary);
+      text-decoration: none;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      transition: all 0.3s ease;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 40px;
+    }
+
+    .back-button:hover {
+      border-color: #0284c7;
+      transform: translateX(-5px);
+      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.4);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeInUp 0.8s ease;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      border-radius: 30px;
+      background: rgba(2, 132, 199, 0.2);
+      border: 1px solid rgba(2, 132, 199, 0.4);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(40px, 7vw, 64px);
+      font-weight: 900;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #0284c7, #0ea5e9, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -2px;
+    }
+
+    .page-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Announcements Grid - Fixed height cards */
+    .announcements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 28px;
+      margin-top: 40px;
+      animation: fadeInUp 0.8s ease 0.4s backwards;
+    }
+
+    .announcement-card {
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      height: 480px;
+      animation: slideUp 0.6s ease backwards;
+    }
+
+    .announcement-card:nth-child(1) { animation-delay: 0.5s; }
+    .announcement-card:nth-child(2) { animation-delay: 0.6s; }
+    .announcement-card:nth-child(3) { animation-delay: 0.7s; }
+    .announcement-card:nth-child(4) { animation-delay: 0.8s; }
+    .announcement-card:nth-child(5) { animation-delay: 0.9s; }
+    .announcement-card:nth-child(6) { animation-delay: 1s; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .announcement-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(2, 132, 199, 0.05), rgba(6, 182, 212, 0.05));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .announcement-card:hover::before {
+      opacity: 1;
+    }
+
+    .announcement-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0284c7, #0ea5e9, #06b6d4);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s ease;
+    }
+
+    .announcement-card:hover::after {
+      transform: scaleX(1);
+    }
+
+    .announcement-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 24px 64px rgba(2, 132, 199, 0.3);
+    }
+
+    .announcement-image-container {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, rgba(2, 132, 199, 0.2), rgba(6, 182, 212, 0.2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .announcement-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .announcement-image-placeholder {
+      font-size: 60px;
+      opacity: 0.4;
+    }
+
+    .announcement-content-wrapper {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      position: relative;
+      z-index: 2;
+    }
+
+    .announcement-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.3;
+      min-height: 57px;
+      letter-spacing: -0.5px;
+    }
+
+    .announcement-content {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .announcement-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 2px solid var(--glass-border);
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 50px;
+      align-items: center;
+    }
+
+    .pagination-btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background: var(--btn-gradient);
+      border-color: #0284c7;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.4);
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 0 10px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 80px 40px;
+      border-radius: 24px;
+      animation: fadeInUp 0.8s ease;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid var(--glass-border);
+      border-top: 4px solid #0284c7;
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 1s linear infinite;
+      margin-bottom: 24px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .no-announcements {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-secondary);
+      font-size: 18px;
+      border-radius: 24px;
+    }
+
+    .no-announcements-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 20px 60px;
+      }
+
+      .announcements-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .page-title {
+        font-size: 40px;
+        letter-spacing: -1px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <a href="../dashboard/dashboard.html" class="back-button">← Back to Dashboard</a>
+
+    <header class="header">
+      <div class="header-badge">
+        <span>📢</span>
+        <span>Announcements</span>
+      </div>
+      <h1 class="page-title">College Announcements</h1>
+      <p class="page-subtitle">Stay updated with the latest news and campus happenings</p>
+    </header>
+
+    <div id="announcementsContainer">
+      <div class="loading glass">
+        <div class="loading-spinner"></div>
+        <p style="color: var(--text-secondary); font-size: 18px; font-weight: 600;">Loading announcements...</p>
+      </div>
+    </div>
+
+    <div class="pagination" id="paginationContainer" style="display:none;">
+      <button class="pagination-btn" id="prevBtn" onclick="changePage(-1)">← Prev</button>
+      <span class="pagination-info" id="pageInfo">Page 1 of 1</span>
+      <button class="pagination-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = "http://localhost:5000/";
+   // const API_BASE_URL = "https://primarykey-production-6114.up.railway.app/";
+    let currentPage = 1, totalPages = 1;
+
+    function getAuthToken() {
+      return sessionStorage.getItem('authToken') || localStorage.getItem('authToken') || 'demo-token';
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function createAnnouncementCard(a) {
+      const img = a.image_url ? `${API_BASE_URL}${a.image_url.substring(1)}` : '';
+      const imageSection = img 
+        ? `<img src="${img}" alt="${a.title}" class="announcement-image">`
+        : `<div class="announcement-image-placeholder">📢</div>`;
+      
+      return `
+        <div class="announcement-card glass" onclick="openAnnouncementDetail('${a.announcement_id || a._id || ''}')">
+          <div class="announcement-image-container">
+            ${imageSection}
+          </div>
+          <div class="announcement-content-wrapper">
+            <h3 class="announcement-title">${a.title}</h3>
+            <p class="announcement-content">${a.content}</p>
+            <div class="announcement-footer">
+              <span class="footer-item">👤 ${a.posted_by || 'Admin'}</span>
+              <span class="footer-item">🕒 ${formatDate(a.created_at)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function displayAnnouncements(list) {
+      const container = document.getElementById('announcementsContainer');
+      if (!list.length) {
+        container.innerHTML = `
+          <div class="no-announcements glass">
+            <div class="no-announcements-icon">📢</div>
+            <p>No announcements found.</p>
+          </div>
+        `;
+        return;
+      }
+      container.innerHTML = `<div class="announcements-grid">${list.map(createAnnouncementCard).join('')}</div>`;
+    }
+
+    async function fetchAnnouncements() {
+      try {
+        const res = await fetch(`${API_BASE_URL}api/announcements/college?page=${currentPage}&limit=12`, {
+          headers: { 'Authorization': 'Bearer ' + getAuthToken() }
+        });
+        const data = await res.json();
+        displayAnnouncements(data.announcements || []);
+        updatePagination(data.pagination);
+      } catch (err) {
+        document.getElementById('announcementsContainer').innerHTML = `
+          <div class="no-announcements glass">
+            <div class="no-announcements-icon">⚠️</div>
+            <p>Error loading announcements</p>
+          </div>
+        `;
+      }
+    }
+
+    function updatePagination(p) {
+      const pagination = document.getElementById('paginationContainer');
+      if (!p || p.total_pages <= 1) return pagination.style.display = 'none';
+      pagination.style.display = 'flex';
+      document.getElementById('pageInfo').textContent = `Page ${p.current_page} of ${p.total_pages}`;
+      document.getElementById('prevBtn').disabled = p.current_page <= 1;
+      document.getElementById('nextBtn').disabled = p.current_page >= p.total_pages;
+      currentPage = p.current_page;
+      totalPages = p.total_pages;
+    }
+
+    function changePage(dir) {
+      const newPage = currentPage + dir;
+      if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        fetchAnnouncements();
+      }
+    }
+
+    function openAnnouncementDetail(id) {
+      window.location.href = `announcement-detail.html?id=${id}`;
+    }
+
+    window.onload = fetchAnnouncements;
+  </script>
+  <script src="../assets/sidebar.js"></script>
+</body>
+</html>

@@ -1,110 +1,438 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Interview Experiences</title>
+  <title>Interview Experiences - PRIMARY KEY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/theme.css">
+  <link rel="stylesheet" href="../assets/sidebar.css">
+  
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 10px;
-      background: #f9fafb;
-      color: #2c3e50;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    h1 {
+
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    /* Back Button */
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--glass-bg);
+      color: var(--success-text);
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--glass-border);
+    }
+
+    .back-button:hover {
+      transform: translateX(-3px);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+      background: var(--input-focus-bg);
+    }
+
+    /* Page Header */
+    .page-header {
       text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .page-title {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .page-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
       margin-bottom: 30px;
     }
-    #errorMessage {
-      color: red;
-      margin-bottom: 20px;
-      text-align: center;
+
+    .header-actions {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
-    .card {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-      padding: 15px 20px;
-      margin-bottom: 15px;
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: var(--btn-gradient);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
       cursor: pointer;
-      transition: box-shadow 0.3s ease;
-      overflow: hidden;
-      max-height: 100px;
-      position: relative;
+      transition: all 0.3s ease;
+      text-decoration: none;
     }
-    .card:hover {
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+
+    .btn-primary:hover {
+      background: #0369a1;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
     }
-    .card.expanded {
-      max-height: 1000px; /* big enough to show content */
-      cursor: default;
+
+    /* Error Message */
+    #errorMessage {
+      background: var(--error-bg);
+      border: 2px solid var(--error-border);
+      color: var(--error-text);
+      padding: 15px 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 30px;
+      display: none;
     }
+
+    #errorMessage.show {
+      display: block;
+    }
+
+    /* Loading State */
+    .loading {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-secondary);
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid var(--input-bg);
+      border-top: 4px solid var(--success-text);
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Experiences Grid */
+    .experiences-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 30px;
+    }
+
+    .experience-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 2px solid var(--glass-border);
+    }
+
+    .experience-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(2, 132, 199, 0.2);
+      border-color: var(--input-focus-border);
+    }
+
     .card-header {
       display: flex;
       justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      gap: 15px;
+    }
+
+    .student-info {
+      flex: 1;
+    }
+
+    .student-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
       align-items: center;
-      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .student-icon {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: var(--btn-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: white;
+      font-weight: 700;
+    }
+
+    .company-name {
+      font-size: 18px;
       font-weight: 600;
-      font-size: 1.1rem;
+      color: var(--success-text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .card-header > div {
-      margin: 5px 0;
+
+    .date-badge {
+      background: var(--btn-gradient);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
     }
-    .card-details {
-      margin-top: 15px;
-      font-weight: normal;
-      font-size: 0.95rem;
-      color: #444;
-      display: none;
+
+    .card-content {
+      margin-bottom: 20px;
     }
-    .card.expanded .card-details {
-      display: block;
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 12px;
+      background: var(--input-bg);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      border: 1px solid var(--input-border);
     }
-    .rounds {
-      margin-top: 12px;
-      padding-left: 15px;
-      border-left: 2px solid #3498db;
+
+    .info-row:hover {
+      background: var(--input-focus-bg);
+      border-color: var(--input-focus-border);
     }
-    .round {
-      margin-bottom: 10px;
+
+    .info-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
     }
-    .round strong {
-      display: block;
-      color: #2980b9;
-      margin-bottom: 3px;
+
+    .info-value {
+      font-size: 15px;
+      color: var(--text-primary);
+      font-weight: 600;
     }
-    .round p {
-      margin: 0 0 5px 0;
+
+    .package-highlight {
+      color: var(--success-text);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 20px;
+      border-top: 2px solid var(--glass-border);
+    }
+
+    .rounds-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--input-bg);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border: 1px solid var(--input-border);
+    }
+
+    .view-details {
+      color: var(--success-text);
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .experience-card:hover .view-details {
+      gap: 12px;
+    }
+
+    .no-experiences {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-secondary);
+      font-size: 18px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--glass-border);
+    }
+
+    .no-experiences-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-muted);
+      margin-top: 60px;
+      font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 30px 20px;
+      }
+
+      .experiences-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn-primary {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .card-header {
+        flex-direction: column;
+      }
+
+      .date-badge {
+        align-self: flex-start;
+      }
+
+      .page-title {
+        font-size: 28px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Main Container -->
+  <div class="container">
+    <a href="../dashboard/dashboard.html" class="back-button">
+      ← Back to Dashboard
+    </a>
 
-  <h1>Interview Experiences by College</h1>
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">Interview Experiences</h1>
+      <p class="page-subtitle">Learn from your peers' interview journeys and success stories</p>
+      
+      <div class="header-actions">
+        <a href="add-experience.html" class="btn-primary">
+          <span>✨</span>
+          <span>Share Your Experience</span>
+        </a>
+      </div>
+    </div>
 
-  <div id="errorMessage"></div>
+    <!-- Error Message -->
+    <div id="errorMessage"></div>
 
-  <div id="experiencesContainer"></div>
+    <!-- Experiences Container -->
+    <div id="experiencesContainer">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading experiences...</p>
+      </div>
+    </div>
+  </div>
 
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Primary Key. All rights reserved.</p>
+  </footer>
+
+  <script src="../assets/sidebar.js"></script>
+  
   <script>
-    const API_URL = '${API_URL}/interviews/college';
+    const API_URL = 'http://localhost:5000/';
+   // const API_URL = 'https://primarykey-production-6114.up.railway.app/';
     const experiencesContainer = document.getElementById('experiencesContainer');
     const errorMessage = document.getElementById('errorMessage');
 
+    function logout() {
+      if (typeof(Storage) !== "undefined") {
+        sessionStorage.clear();
+        localStorage.clear();
+      }
+      window.location.href = "../auth/registration.html";
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadExperiences();
+    });
+
     async function loadExperiences() {
+      errorMessage.classList.remove('show');
       errorMessage.textContent = '';
-      experiencesContainer.innerHTML = '';
+      experiencesContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Loading experiences...</p></div>';
 
       const token = localStorage.getItem('authToken');
+      
       if (!token) {
-        errorMessage.textContent = 'Authentication token not found. Please login first.';
+        errorMessage.textContent = '🔒 Authentication token not found. Please login first.';
+        errorMessage.classList.add('show');
+        experiencesContainer.innerHTML = '';
         return;
       }
 
       try {
-        const response = await fetch(API_URL, {
+        const response = await fetch(`${API_URL}api/interviews/college`, {
           headers: {
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/json'
@@ -113,75 +441,103 @@
 
         if (!response.ok) {
           if (response.status === 401) {
-            throw new Error('Unauthorized: Invalid or expired token.');
+            throw new Error('🔒 Unauthorized: Invalid or expired token.');
           } else {
-            throw new Error('Failed to fetch data. Status: ' + response.status);
+            throw new Error('⚠️ Failed to fetch data. Status: ' + response.status);
           }
         }
 
         const experiences = await response.json();
 
         if (!Array.isArray(experiences) || experiences.length === 0) {
-          experiencesContainer.innerHTML = '<p>No interview experiences found.</p>';
+          experiencesContainer.innerHTML = `
+            <div class="no-experiences">
+              <div class="no-experiences-icon">💼</div>
+              <p>No interview experiences found for your college yet.</p>
+              <p style="margin-top: 15px; font-size: 16px;">Be the first to share your experience!</p>
+            </div>
+          `;
           return;
         }
 
-        experiences.forEach(exp => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-
-          // Header info shown on collapsed card
-          card.innerHTML = `
-            <div class="card-header">
-              <div><strong>Student:</strong> ${exp.student_name}</div>
-              <div><strong>Company:</strong> ${exp.company_name}</div>
-              <div><strong>Date Submitted:</strong> ${new Date(exp.created_at).toLocaleDateString()}</div>
-              <div><strong>Rounds:</strong> ${exp.rounds ? exp.rounds.length : 0}</div>
-              <div><strong>Package:</strong> ₹${parseFloat(exp.package_offered).toLocaleString()}</div>
-            </div>
-            <div class="card-details">
-              <p><strong>Job Role:</strong> ${exp.job_role}</p>
-              <p><strong>Location:</strong> ${exp.job_location}</p>
-              <p><strong>Experience Summary:</strong> ${exp.experience_summary}</p>
-              <div class="rounds">
-                <h4>Interview Rounds:</h4>
-              </div>
-            </div>
-          `;
-
-          // Add rounds details inside rounds div
-          const roundsDiv = card.querySelector('.rounds');
-          if (exp.rounds && exp.rounds.length > 0) {
-            exp.rounds.forEach(round => {
-              const roundDiv = document.createElement('div');
-              roundDiv.classList.add('round');
-              roundDiv.innerHTML = `
-                <strong>Round ${round.round_number}: ${round.round_type}</strong>
-                <p>${round.round_description}</p>
-                <p><em>Date: ${new Date(round.round_date).toLocaleDateString()}</em></p>
-              `;
-              roundsDiv.appendChild(roundDiv);
-            });
-          } else {
-            roundsDiv.innerHTML += '<p>No interview rounds details available.</p>';
-          }
-
-          // Toggle expand/collapse on click
-          card.addEventListener('click', () => {
-            card.classList.toggle('expanded');
-          });
-
-          experiencesContainer.appendChild(card);
-        });
+        renderExperiences(experiences);
 
       } catch (err) {
         errorMessage.textContent = err.message;
+        errorMessage.classList.add('show');
+        experiencesContainer.innerHTML = '';
       }
     }
 
-    // Load experiences on page load
-    window.onload = loadExperiences;
-  </script>
+    function renderExperiences(experiences) {
+      experiencesContainer.innerHTML = '';
+      const grid = document.createElement('div');
+      grid.className = 'experiences-grid';
 
+      experiences.forEach((exp, index) => {
+        const card = document.createElement('div');
+        card.className = 'experience-card';
+
+        const initials = exp.student_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="student-info">
+              <div class="student-name">
+                <div class="student-icon">${initials}</div>
+                ${exp.student_name}
+              </div>
+              <div class="company-name">
+                <span>🏢</span>
+                ${exp.company_name}
+              </div>
+            </div>
+            <div class="date-badge">
+              ${new Date(exp.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </div>
+          </div>
+          
+          <div class="card-content">
+            <div class="info-row">
+              <span class="info-label">Role</span>
+              <span class="info-value">${exp.job_role}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Location</span>
+              <span class="info-value">${exp.job_location}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Package</span>
+              <span class="info-value package-highlight">₹${parseFloat(exp.package_offered).toLocaleString()} LPA</span>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="rounds-badge">
+              <span>📋</span>
+              <span>${exp.rounds ? exp.rounds.length : 0} Rounds</span>
+            </div>
+            <div class="view-details">
+              <span>View Details</span>
+              <span>→</span>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          openExperienceDetail(exp);
+        });
+
+        grid.appendChild(card);
+      });
+
+      experiencesContainer.appendChild(grid);
+    }
+
+    function openExperienceDetail(experience) {
+      sessionStorage.setItem('selectedExperience', JSON.stringify(experience));
+      window.location.href = 'experience-detail.html';
+    }
+  </script>
 </body>
 </html>

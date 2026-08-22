@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Article - PRIMARY KEY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/theme.css">
+  <link rel="stylesheet" href="../assets/sidebar.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body { font-family: 'Inter', sans-serif; }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      padding: 20px 32px 60px;
+      gap: 16px;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .breadcrumb { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+    .breadcrumb a { color: var(--success-text); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 16px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      color: var(--text-primary);
+      text-decoration: none;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      transition: all 0.2s ease;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .back-button:hover {
+      border-color: var(--input-focus-border);
+      transform: translateX(-4px);
+      background: var(--input-focus-bg);
+    }
+
+    .article-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 32px 36px;
+    }
+
+    .article-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 10px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .article-header-icon {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: 11px;
+      background: var(--btn-gradient);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .article-title { font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; line-height: 1.3; }
+    .article-meta { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-weight: 600; }
+
+    .article-body { margin-top: 20px; font-size: 15px; line-height: 1.75; color: var(--text-secondary); }
+    .article-body p { margin: 0 0 16px; }
+    .article-body h1, .article-body h2, .article-body h3 {
+      color: var(--text-primary); margin: 26px 0 12px; font-weight: 700; line-height: 1.35;
+    }
+    .article-body h1 { font-size: 21px; }
+    .article-body h2 { font-size: 19px; }
+    .article-body h3 { font-size: 17px; }
+    .article-body ul, .article-body ol { margin: 0 0 16px 22px; }
+    .article-body li { margin-bottom: 6px; }
+    .article-body code {
+      background: var(--input-bg);
+      border: 1px solid var(--glass-border);
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 13px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      color: var(--success-text);
+    }
+    .article-body pre {
+      background: var(--input-bg);
+      border: 1px solid var(--glass-border);
+      padding: 14px 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      margin: 0 0 16px;
+    }
+    .article-body pre code { background: none; border: none; padding: 0; color: var(--text-primary); }
+    .article-body img { max-width: 100%; border-radius: 10px; margin: 10px 0; }
+    .article-body a { color: var(--success-text); font-weight: 600; }
+    .article-body blockquote {
+      border-left: 3px solid var(--input-focus-border);
+      padding: 6px 16px;
+      margin: 0 0 16px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .quiz-cta {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .quiz-cta p { font-size: 13px; color: var(--text-secondary); }
+    .quiz-cta a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: var(--btn-gradient);
+      color: white;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.28);
+      transition: transform 0.15s ease;
+      flex-shrink: 0;
+    }
+    .quiz-cta a:hover { transform: translateY(-2px); }
+
+    .loading, .error, .no-data {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      border-radius: 14px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      text-align: center;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--input-bg);
+      border-top: 4px solid var(--success-text);
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 1s linear infinite;
+      margin-bottom: 14px;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .error { background: var(--error-bg); border: 2px solid var(--error-border); color: var(--error-text); }
+    .error button {
+      margin-top: 12px;
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--error-border);
+      background: transparent;
+      color: var(--error-text);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .error button:hover { background: var(--error-border); color: white; }
+
+    .no-data p { color: var(--text-secondary); font-size: 13px; }
+
+    .back-link { display: inline-block; margin-top: 10px; color: var(--success-text); text-decoration: none; font-size: 13px; font-weight: 700; }
+    .back-link:hover { text-decoration: underline; }
+
+    @media (max-width: 768px) {
+      .page { padding: 14px 16px 40px; gap: 12px; }
+      .article-card { padding: 22px 18px; }
+      .article-title { font-size: 20px; }
+      .quiz-cta { flex-direction: column; align-items: stretch; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <a href="javascript:void(0)" class="back-button" id="backButton">← Back to Topics</a>
+
+    <div class="breadcrumb">
+      <a href="tutorials.html">Tutorials</a>
+      <span id="breadcrumbTutorial"></span>
+      <span id="breadcrumbArticle"></span>
+    </div>
+
+    <div id="content-area">
+      <div class="loading" id="loadingState">
+        <div class="loading-spinner"></div>
+        <p style="color: var(--text-secondary); font-size: 14px; font-weight: 600;">Loading article...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    const API_BASE = '';
+    const contentArea = document.getElementById('content-area');
+    const backButton = document.getElementById('backButton');
+
+    const params = new URLSearchParams(window.location.search);
+    const topicId = params.get('topic_id');
+    const articleId = params.get('article_id');
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function renderArticle(article, topic) {
+      backButton.href = topic && topic.tutorial_id
+        ? `topics.html?tutorial_id=${encodeURIComponent(topic.tutorial_id)}`
+        : 'tutorials.html';
+
+      if (topic) {
+        document.getElementById('breadcrumbTutorial').innerHTML =
+          ` / <a href="topics.html?tutorial_id=${encodeURIComponent(topic.tutorial_id || '')}">${escapeHtml(topic.title || 'Topics')}</a>`;
+      }
+      document.getElementById('breadcrumbArticle').textContent = ` / ${article.title || ''}`;
+      document.title = `${article.title || 'Article'} | Primary Key`;
+
+      const quizLink = topicId
+        ? `quizinterface.html?topic_id=${encodeURIComponent(topicId)}`
+        : (article.topic_id ? `quizinterface.html?topic_id=${encodeURIComponent(article.topic_id)}` : null);
+
+      contentArea.innerHTML = `
+        <div class="article-card">
+          <div class="article-header">
+            <div class="article-header-icon">📖</div>
+            <div>
+              <div class="article-title">${escapeHtml(article.title)}</div>
+              <div class="article-meta">${formatDate(article.created_at)}</div>
+            </div>
+          </div>
+          <div class="article-body">${article.content || '<p>No content available for this article.</p>'}</div>
+          ${quizLink ? `
+            <div class="quiz-cta">
+              <p>Done reading? Test what you've learned.</p>
+              <a href="${quizLink}">
+                <span>📝</span>
+                <span>Take the Quiz</span>
+              </a>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderError(message, showBack) {
+      contentArea.innerHTML = `
+        <div class="error">
+          <h3 style="font-size: 18px; margin-bottom: 8px;">⚠️ Error</h3>
+          <p style="font-size: 13px;">${escapeHtml(message)}</p>
+          <button type="button" onclick="location.reload()">Retry</button>
+          ${showBack ? `<br><a class="back-link" href="tutorials.html">← Back to tutorials</a>` : ''}
+        </div>`;
+    }
+
+    async function loadTopicInfo(id) {
+      try {
+        const res = await fetch(`${API_BASE}/api/topics/${encodeURIComponent(id)}`);
+        const data = await res.json();
+        if (res.ok && data.success) return data.topic;
+      } catch (err) {
+        console.error('Error loading topic info:', err);
+      }
+      return null;
+    }
+
+    async function loadArticleByTopic(id) {
+      const res = await fetch(`${API_BASE}/api/articles/topic/${encodeURIComponent(id)}`);
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to load article');
+      }
+
+      const list = data.articles || (data.article ? [data.article] : []);
+      if (list.length === 0) {
+        throw new Error('NO_ARTICLE');
+      }
+
+      const summary = list[0];
+      if (summary.content) return summary;
+
+      const fullRes = await fetch(`${API_BASE}/api/articles/${encodeURIComponent(summary.article_id)}`);
+      const fullData = await fullRes.json();
+      if (fullRes.ok && fullData.success && fullData.article) {
+        return fullData.article;
+      }
+      return summary;
+    }
+
+    async function loadArticleById(id) {
+      const res = await fetch(`${API_BASE}/api/articles/${encodeURIComponent(id)}`);
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to load article');
+      }
+      return data.article;
+    }
+
+    async function init() {
+      if (!topicId && !articleId) {
+        contentArea.innerHTML = `
+          <div class="no-data">
+            <p>No article was specified.</p>
+            <a class="back-link" href="tutorials.html">← Back to tutorials</a>
+          </div>`;
+        return;
+      }
+
+      try {
+        let article;
+
+        if (topicId) {
+          article = await loadArticleByTopic(topicId);
+        } else {
+          article = await loadArticleById(articleId);
+        }
+
+        const parentTopicId = topicId || article.topic_id;
+        const topic = parentTopicId ? await loadTopicInfo(parentTopicId) : null;
+
+        renderArticle(article, topic);
+      } catch (err) {
+        console.error('Error loading article:', err);
+        if (err.message === 'NO_ARTICLE') {
+          contentArea.innerHTML = `
+            <div class="no-data">
+              <div style="font-size: 42px; margin-bottom: 10px;">📄</div>
+              <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-primary);">No Article Yet</h3>
+              <p>This topic doesn't have a published article yet.</p>
+              <a class="back-link" href="tutorials.html">← Back to tutorials</a>
+            </div>`;
+        } else {
+          renderError('Could not load the article. Please check your connection and try again.', true);
+        }
+      }
+    }
+
+    init();
+  })();
+  </script>
+  <script src="./assets/sidebar.js"></script>
+</body>
+</html>

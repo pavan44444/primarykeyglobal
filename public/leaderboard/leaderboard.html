@@ -1,187 +1,671 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Leaderboard - PrimaryKey</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <title>Leaderboard - PRIMARY KEY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/theme.css">
+  <link rel="stylesheet" href="../assets/sidebar.css">
   <style>
-    :root {
-      --bg: #0f0f23;
-      --card: #1a1a2e;
-      --accent: #ffd700;
-      --text: #fff;
-      --muted: rgba(255,255,255,0.6);
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden; /* no page scroll */
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 2rem;
     }
 
-    h1 {
-      text-align: center;
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-    }
-
-    p.subtitle {
-      text-align: center;
-      font-size: 1.2rem;
-      color: var(--muted);
-      margin-bottom: 2rem;
-    }
-
-    .college-select {
-      display: block;
-      margin: 0 auto 2rem;
-      padding: 10px 20px;
-      font-size: 1rem;
-      border-radius: 10px;
-      border: none;
-      background: var(--card);
-      color: var(--text);
-    }
-
-    .leaderboard {
-      max-width: 800px;
+    /* Everything lives in one viewport-height column */
+    .page {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 32px 16px;
+      gap: 14px;
+      max-width: 1200px;
       margin: 0 auto;
-      border-radius: 16px;
-      overflow: hidden;
     }
 
-    .entry {
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 16px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      color: var(--text-primary);
+      text-decoration: none;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      transition: all 0.2s ease;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .back-button:hover {
+      border-color: var(--input-focus-border);
+      transform: translateX(-4px);
+      background: var(--input-focus-bg);
+    }
+
+    .header {
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .page-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
       display: flex;
       align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* User Rank Card — compact single row */
+    .user-rank-card {
+      flex-shrink: 0;
+      padding: 14px 24px;
+      border-radius: 14px;
+      background: var(--btn-gradient);
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.28);
+      display: flex;
       justify-content: space-between;
-      padding: 1rem 1.5rem;
-      background: var(--card);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      transition: background 0.3s;
+      align-items: center;
+      gap: 20px;
     }
 
-    .entry:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .rank {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--accent);
-      width: 40px;
-    }
-
-    .user-info {
+    .user-rank-info {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .user-rank-info h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      white-space: nowrap;
+    }
+
+    .user-rank-info p {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-stats {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .stat-item {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 6px 14px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      text-align: center;
+      min-width: 64px;
+    }
+
+    .stat-label {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.8);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      font-weight: 800;
+      color: white;
+      line-height: 1.3;
+    }
+
+    .user-rank-position {
+      font-size: 28px;
+      font-weight: 900;
+      color: white;
+      text-align: center;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .user-rank-position-label {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* Table fills remaining space, rows are seamless (no gaps) */
+    .leaderboard-table {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      overflow: hidden;
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 1fr 100px 100px 100px;
+      gap: 12px;
+      padding: 10px 20px;
+      background: var(--btn-gradient);
+      color: white;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      flex-shrink: 0;
+    }
+
+    .table-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;       /* 🔁 add this */
+}
+
+    /* Rows share the remaining height equally, divided by hairlines only */
+    .table-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 100px 100px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  flex: 0 0 auto;        /* 🔁 changed from flex: 1 1 0 */
+  min-height: 56px;      /* 🔁 gives each row a consistent, sane height */
+  border-bottom: 1px solid var(--glass-border);
+  transition: background 0.2s ease;
+}
+    .table-body .table-row:last-child {
+      border-bottom: none;
+    }
+
+    .table-row:hover {
+      background: var(--input-focus-bg);
+    }
+
+    .table-row.current-user {
+      background: var(--success-bg);
+    }
+
+    .table-row.rank-1 .rank-badge {
+      background: linear-gradient(135deg, #ffd700, #ffa500);
+    }
+
+    .table-row.rank-2 .rank-badge {
+      background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+    }
+
+    .table-row.rank-3 .rank-badge {
+      background: linear-gradient(135deg, #cd7f32, #b8722a);
+    }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .rank-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: var(--btn-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 12px;
+      color: white;
+      flex-shrink: 0;
     }
 
     .avatar {
-      width: 48px;
-      height: 48px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
-      background: #444;
-      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .user-details {
+      flex: 1;
+      min-width: 0;
     }
 
     .name {
-      font-size: 1.1rem;
+      font-size: 13px;
       font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
     }
 
     .college {
-      font-size: 0.9rem;
-      color: var(--muted);
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
     }
 
-    .coins {
+    .stat-cell {
       font-weight: 600;
-      font-size: 1.1rem;
+      font-size: 13px;
+      color: var(--text-primary);
+      text-align: center;
     }
 
-    .coins::after {
-      content: ' 🪙';
+    .stat-cell.points {
+      color: var(--success-text);
+      font-weight: 700;
     }
 
-    @media(max-width: 600px) {
-      .entry {
-        flex-direction: column;
-        align-items: flex-start;
+    /* Loading/Error/Empty states fill the table area */
+    .loading, .error, .no-data {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      border-radius: 14px;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--input-bg);
+      border-top: 4px solid var(--success-text);
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 1s linear infinite;
+      margin-bottom: 14px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: var(--error-bg);
+      border: 2px solid var(--error-border);
+      color: var(--error-text);
+    }
+
+    .no-data {
+      background: var(--glass-bg);
+    }
+
+    /* Responsive — still no page scroll, rows shrink instead */
+    @media (max-width: 768px) {
+      .page {
+        padding: 14px 16px 12px;
         gap: 10px;
       }
-      .coins {
-        align-self: flex-end;
+
+      .page-title {
+        font-size: 20px;
+      }
+
+      .user-rank-card {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        padding: 12px 16px;
+      }
+
+      .user-rank-info {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .user-stats {
+        justify-content: center;
+      }
+
+      .table-header {
+        display: none;
+      }
+
+      .table-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        padding: 8px 12px;
+      }
+
+      .stat-cell {
+        display: flex;
+        justify-content: space-between;
+        text-align: left;
+        font-size: 12px;
+      }
+
+      .stat-cell::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 10px;
+        text-transform: uppercase;
       }
     }
   </style>
 </head>
 <body>
+  <div class="page">
+    <a href="../dashboard/dashboard.html" class="back-button">
+      ← Back to Dashboard
+    </a>
 
-  <h1>🏆 Leaderboard</h1>
-  <p class="subtitle">Be the <strong>Primary Key</strong> of your college. Earn coins. Climb ranks. Make impact.</p>
+    <div class="header">
+      <h1 class="page-title">
+        <span>🏆</span>
+        <span>Leaderboard</span>
+      </h1>
+      <p class="page-subtitle">Earn points, climb ranks, and compete.</p>
+    </div>
 
-  <select class="college-select" id="collegeSelect">
-    <option value="all">All Colleges</option>
-    <option value="MIT">MIT</option>
-    <option value="IIT Bombay">IIT Bombay</option>
-    <option value="NIT Trichy">NIT Trichy</option>
-    <option value="BITS Pilani">BITS Pilani</option>
-    <!-- Add more as needed -->
-  </select>
+    <div id="userRankCard"></div>
 
-  <div class="leaderboard" id="leaderboardList">
-    <!-- JS will inject users here -->
+    <div class="leaderboard-table" id="leaderboardContainer">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p style="color: var(--text-secondary); font-size: 14px; font-weight: 600;">Loading leaderboard...</p>
+      </div>
+    </div>
   </div>
 
   <script>
-    const users = [
-      { name: "Ananya Singh", college: "MIT", coins: 950, avatar: "https://i.pravatar.cc/48?img=5" },
-      { name: "Rohan Mehta", college: "IIT Bombay", coins: 900, avatar: "https://i.pravatar.cc/48?img=11" },
-      { name: "Priya Das", college: "MIT", coins: 880, avatar: "https://i.pravatar.cc/48?img=21" },
-      { name: "Dev Patel", college: "NIT Trichy", coins: 850, avatar: "https://i.pravatar.cc/48?img=33" },
-      { name: "Kiran Rao", college: "BITS Pilani", coins: 820, avatar: "https://i.pravatar.cc/48?img=36" },
-      { name: "Suresh Naik", college: "MIT", coins: 790, avatar: "https://i.pravatar.cc/48?img=44" },
-    ];
+    const API_BASE_URL = "http://localhost:5000/api";
+    //const API_BASE_URL = "https://primarykey-production-6114.up.railway.app/api";
+    const token = localStorage.getItem('authToken');
 
-    const leaderboardList = document.getElementById("leaderboardList");
-    const collegeSelect = document.getElementById("collegeSelect");
+    let currentLeaderboard = [];
+    let currentUserId = null;
+    let currentUserRole = null;
 
-    function renderLeaderboard(collegeFilter = "all") {
-      leaderboardList.innerHTML = "";
+    const leaderboardContainer = document.getElementById("leaderboardContainer");
+    const userRankCard = document.getElementById("userRankCard");
 
-      const filtered = users
-        .filter(u => collegeFilter === "all" || u.college === collegeFilter)
-        .sort((a, b) => b.coins - a.coins);
+    function getAvatarInitials(name) {
+      return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+    }
 
-      filtered.forEach((user, index) => {
-        const entry = document.createElement("div");
-        entry.className = "entry";
-        entry.innerHTML = `
-          <div class="rank">#${index + 1}</div>
-          <div class="user-info">
-            <img src="${user.avatar}" class="avatar" alt="avatar" />
-            <div>
-              <div class="name">${user.name}</div>
-              <div class="college">${user.college}</div>
+    function generateAvatarColor(name) {
+      const colors = [
+        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+        'linear-gradient(135deg, #30cfd0 0%, #330867 100%)'
+      ];
+
+      const hash = name.split('').reduce((a, b) => {
+        a = ((a << 5) - a) + b.charCodeAt(0);
+        return a & a;
+      }, 0);
+
+      return colors[Math.abs(hash) % colors.length];
+    }
+
+    function getRankDisplay(position) {
+      switch (position) {
+        case 1: return '🥇';
+        case 2: return '🥈';
+        case 3: return '🥉';
+        default: return `#${position}`;
+      }
+    }
+
+    async function fetchUserRank() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/leaderboard/rank/me`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch user rank');
+
+        const data = await response.json();
+        if (data.success && data.rank) {
+          displayUserRank(data.rank);
+        }
+      } catch (error) {
+        console.error('Error fetching user rank:', error);
+      }
+    }
+
+    function displayUserRank(rank) {
+      const averageScore = rank.quizzes_taken > 0
+        ? (rank.total_points / rank.quizzes_taken).toFixed(1)
+        : '0.0';
+
+      userRankCard.innerHTML = `
+        <div class="user-rank-card">
+          <div class="user-rank-info">
+            <h3>Your Performance</h3>
+            <p>${rank.user_name} • ${rank.college_name}</p>
+            <div class="user-stats">
+              <div class="stat-item">
+                <div class="stat-label">Quizzes</div>
+                <div class="stat-value">${rank.quizzes_taken || 0}</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Points</div>
+                <div class="stat-value">${rank.total_points}</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Avg Score</div>
+                <div class="stat-value">${averageScore}</div>
+              </div>
             </div>
           </div>
-          <div class="coins">${user.coins}</div>
+          <div>
+            <div class="user-rank-position">${getRankDisplay(rank.rank_position)}</div>
+            <div class="user-rank-position-label">Your Rank</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function fetchMyCollegeLeaderboard() {
+      try {
+        showLoading();
+
+        const response = await fetch(`${API_BASE_URL}/leaderboard/my-college`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Please login to view the leaderboard');
+          }
+          throw new Error('Failed to fetch leaderboard');
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          currentLeaderboard = data.leaderboard.filter(user =>
+            user.role !== 'admin' && user.role !== 'Admin'
+          );
+          renderLeaderboard();
+        } else {
+          throw new Error(data.error || 'Failed to load leaderboard');
+        }
+
+      } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        showError(error.message);
+      }
+    }
+
+    function showLoading() {
+      leaderboardContainer.innerHTML = `
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p style="color: var(--text-secondary); font-size: 14px; font-weight: 600;">Loading leaderboard...</p>
+        </div>
+      `;
+    }
+
+    function showError(message) {
+      leaderboardContainer.innerHTML = `
+        <div class="error">
+          <h3 style="font-size: 18px; margin-bottom: 8px;">⚠️ Error</h3>
+          <p style="font-size: 13px;">${message}</p>
+        </div>
+      `;
+    }
+
+    function renderLeaderboard() {
+      if (currentLeaderboard.length === 0) {
+        leaderboardContainer.innerHTML = `
+          <div class="no-data">
+            <div style="font-size: 42px; margin-bottom: 10px;">🏆</div>
+            <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-primary);">No Rankings Yet</h3>
+            <p style="color: var(--text-secondary); font-size: 13px;">Be the first to earn points!</p>
+          </div>
         `;
-        leaderboardList.appendChild(entry);
+        return;
+      }
+
+      leaderboardContainer.innerHTML = `
+        <div class="table-header">
+          <div>Student</div>
+          <div style="text-align: center;">Quizzes</div>
+          <div style="text-align: center;">Points</div>
+          <div style="text-align: center;">Avg Score</div>
+        </div>
+        <div class="table-body" id="tableBody"></div>
+      `;
+
+      const tableBody = document.getElementById('tableBody');
+
+      currentLeaderboard.forEach((user, index) => {
+        const position = index + 1;
+        const averageScore = user.quizzes_taken > 0
+          ? (user.total_points / user.quizzes_taken).toFixed(1)
+          : '0.0';
+
+        const row = document.createElement("div");
+        row.className = "table-row";
+
+        if (position <= 3) {
+          row.classList.add(`rank-${position}`);
+        }
+
+        if (currentUserId && user.user_id === currentUserId) {
+          row.classList.add('current-user');
+        }
+
+        row.innerHTML = `
+          <div class="user-cell">
+            <div class="rank-badge">${position}</div>
+            <div class="avatar" style="background: ${generateAvatarColor(user.name)}">
+              ${getAvatarInitials(user.name)}
+            </div>
+            <div class="user-details">
+              <div class="name">${user.name}</div>
+              <div class="college">${user.college_name}</div>
+            </div>
+          </div>
+          <div class="stat-cell" data-label="Quizzes">${user.quizzes_taken || 0}</div>
+          <div class="stat-cell points" data-label="Points">${user.total_points}</div>
+          <div class="stat-cell" data-label="Avg Score">${averageScore}</div>
+        `;
+
+        tableBody.appendChild(row);
       });
     }
 
-    collegeSelect.addEventListener("change", () => {
-      renderLeaderboard(collegeSelect.value);
+    function getCurrentUserInfo() {
+      const userId = localStorage.getItem('userId');
+      const userRole = localStorage.getItem('userRole');
+      if (userId) currentUserId = parseInt(userId);
+      if (userRole) currentUserRole = userRole;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!token) {
+        showError('Please login to view the leaderboard');
+        return;
+      }
+
+      getCurrentUserInfo();
+
+      if (currentUserRole !== 'admin' && currentUserRole !== 'Admin') {
+        await fetchUserRank();
+      }
+
+      await fetchMyCollegeLeaderboard();
     });
 
-    renderLeaderboard();
+    setInterval(() => {
+      if (token) {
+        if (currentUserRole !== 'admin' && currentUserRole !== 'Admin') {
+          fetchUserRank();
+        }
+        fetchMyCollegeLeaderboard();
+      }
+    }, 30000);
   </script>
-
+  <script src="../assets/sidebar.js"></script>
 </body>
 </html>

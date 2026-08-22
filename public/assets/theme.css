@@ -1,0 +1,102 @@
+/* ==========================================================================
+   PRIMARY KEY — SHARED THEME
+   One file, two themes. Toggle by setting data-theme="dark" | "light"
+   on the <html> element. sidebar.js handles the toggle + persistence.
+   ========================================================================== */
+
+:root,
+[data-theme="dark"] {
+    --bg-primary: #000000;
+    --bg-secondary: #0A0E17;
+    --bg-elevated: #10151F;
+    --bg-elevated-hover: #171D2B;
+
+    --text-primary: #F0F2F7;
+    --text-secondary: #9AA4B8;
+    --text-muted: #6B7488;
+
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+
+    --accent: #2F5FE0;          /* cobalt blue, brightened for visibility on black */
+    --accent-hover: #5C82F0;
+    --accent-contrast: #FFFFFF;
+    --accent-secondary: #6E8CF0;
+
+    --btn-gradient: linear-gradient(135deg, #2F5FE0 0%, #0047AB 100%);
+
+    color-scheme: dark;
+}
+
+[data-theme="light"] {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #FFFFFF;
+    --bg-elevated: #FFFFFF;
+    --bg-elevated-hover: #EEF2FF;
+
+    --text-primary: #0A0E17;
+    --text-secondary: #4A5568;
+    --text-muted: #8B93A6;
+
+    --border: rgba(0, 30, 90, 0.10);
+    --border-strong: rgba(0, 30, 90, 0.18);
+
+    --accent: #0047AB;          /* true cobalt, reads well on white */
+    --accent-hover: #003882;
+    --accent-contrast: #FFFFFF;
+    --accent-secondary: #2F5FE0;
+
+    --btn-gradient: linear-gradient(135deg, #1F53C4 0%, #0047AB 100%);
+
+    color-scheme: light;
+}
+
+/* ---- Base resets that every page can rely on ---- */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+::selection {
+    background: var(--accent);
+    color: var(--accent-contrast);
+}
+
+/* Scrollbar (webkit) tuned to theme */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+[data-theme="dark"] {
+    /* ...your existing variables... */
+
+    --success-text: var(--accent);
+    --error-bg: rgba(248, 113, 113, 0.12);
+    --error-border: var(--danger);
+    --error-text: var(--danger);
+    --input-bg: var(--bg-elevated);
+    --input-border: var(--border);
+    --input-focus-bg: var(--bg-elevated-hover);
+    --input-focus-border: var(--accent);
+}
+
+[data-theme="light"] {
+    /* ...your existing variables... */
+
+    --success-text: var(--accent);
+    --error-bg: rgba(220, 38, 38, 0.08);
+    --error-border: var(--danger);
+    --error-text: var(--danger);
+    --input-bg: var(--bg-elevated);
+    --input-border: var(--border);
+    --input-focus-bg: var(--bg-elevated-hover);
+    --input-focus-border: var(--accent);
+}

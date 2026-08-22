@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - PRIMARY KEY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --bg-dark: #0a0f1e;
+            --bg-darker: #050911;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.75);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --glow: rgba(79, 70, 229, 0.4);
+        }
+
+        [data-theme="light"] {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --accent: #8b5cf6;
+            --success: #059669;
+            --warning: #d97706;
+            --error: #dc2626;
+            --bg-dark: #f8fafc;
+            --bg-darker: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --card-border: rgba(79, 70, 229, 0.15);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --glow: rgba(79, 70, 229, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-darker);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.4;
+            background: radial-gradient(circle at 20% 50%, var(--primary) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, var(--secondary) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 20%, var(--accent) 0%, transparent 50%);
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+            z-index: 1;
+            animation: float 25s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            top: -150px;
+            left: -150px;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 8s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(80px, -80px); }
+            66% { transform: translate(-80px, 80px); }
+        }
+
+        .glass {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 32px 80px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logout-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--error), #dc2626);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+        }
+
+        .theme-toggle {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 20px;
+            border: none;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px var(--glow);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 56px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(6, 182, 212, 0.15));
+            border: 1px solid rgba(79, 70, 229, 0.3);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(40px, 7vw, 64px);
+            font-weight: 900;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -2px;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+            animation: fadeInUp 0.8s ease 0.2s backwards;
+        }
+
+        .card {
+            padding: 36px 32px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            animation: slideUp 0.6s ease backwards;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.3s; }
+        .card:nth-child(2) { animation-delay: 0.4s; }
+        .card:nth-child(3) { animation-delay: 0.5s; }
+        .card:nth-child(4) { animation-delay: 0.6s; }
+        .card:nth-child(5) { animation-delay: 0.7s; }
+        .card:nth-child(6) { animation-delay: 0.8s; }
+        .card:nth-child(7) { animation-delay: 0.9s; }
+        .card:nth-child(8) { animation-delay: 1s; }
+        .card:nth-child(9) { animation-delay: 1.1s; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(6, 182, 212, 0.05));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25);
+        }
+
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+            transition: all 0.4s ease;
+        }
+
+        .card:hover .card-icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .card-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            border-radius: 24px;
+            padding: 48px 40px;
+            max-width: 550px;
+            width: 90%;
+            animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .close:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .modal-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--card-border);
+            border-radius: 16px;
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 24px;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+            opacity: 0.7;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--card-border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        /* Messages */
+        .message {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            color: var(--error);
+        }
+
+        /* Success Modal */
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+        }
+
+        .success-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .success-message {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 20px 60px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row, .btn-group {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 36px 24px;
+            }
+
+            .page-title {
+                font-size: 40px;
+                letter-spacing: -1px;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        #csvFile, #companyCsvFile {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container">
+        <div class="top-bar">
+            <button class="logout-btn" onclick="logout()">
+                <span>🚪</span>
+                <span>Logout</span>
+            </button>
+            <button class="theme-toggle glass" onclick="toggleTheme()">
+                <span class="theme-icon">☀️</span>
+            </button>
+        </div>
+
+        <div class="header">
+            <div class="header-badge">
+                <span>👨‍💼</span>
+                <span>Administration Panel</span>
+            </div>
+            <h1 class="page-title">Admin Dashboard</h1>
+            <p class="page-subtitle">Manage your institution's placement activities efficiently</p>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card glass" onclick="openStudentModal()">
+                <div class="card-icon">👥</div>
+                <h3 class="card-title">Add Students</h3>
+                <p class="card-description">Bulk register students using CSV file upload</p>
+            </div>
+
+            <div class="card glass" onclick="openQuizModal()">
+                <div class="card-icon">📝</div>
+                <h3 class="card-title">Create Quiz</h3>
+                <p class="card-description">Design and configure new assessment quizzes</p>
+            </div>
+
+            <div class="card glass" onclick="navigateToQuizHistory()">
+                <div class="card-icon">📊</div>
+                <h3 class="card-title">Quiz History</h3>
+                <p class="card-description">View all active and past quiz records</p>
+            </div>
+
+            <div class="card glass" onclick="navigateToLeaderboard()">
+                <div class="card-icon">🏆</div>
+                <h3 class="card-title">Leaderboard</h3>
+                <p class="card-description">Track student rankings and performance</p>
+            </div>
+
+            <div class="card glass" onclick="openCompanyModal()">
+                <div class="card-icon">🏢</div>
+                <h3 class="card-title">Add Companies</h3>
+                <p class="card-description">Upload company visits and recruitment data</p>
+            </div>
+
+            <div class="card glass" onclick="navigateToExperiences()">
+                <div class="card-icon">💼</div>
+                <h3 class="card-title">Student Experiences</h3>
+                <p class="card-description">Manage placement experiences and testimonials</p>
+            </div>
+
+            <div class="card glass" onclick="fetchUsers()">
+                <div class="card-icon">🔍</div>
+                <h3 class="card-title">All Students</h3>
+                <p class="card-description">View complete student database and profiles</p>
+            </div>
+
+            <div class="card glass" onclick="postAnnouncement()">
+                <div class="card-icon">📢</div>
+                <h3 class="card-title">Announcements</h3>
+                <p class="card-description">Post and manage placement updates</p>
+            </div>
+
+            <div class="card glass" onclick="preperationKit()">
+                <div class="card-icon">📚</div>
+                <h3 class="card-title">Preparation Kits</h3>
+                <p class="card-description">Manage company-wise study resources</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Upload Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content glass">
+            <span class="close" onclick="closeStudentModal()">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title">Upload Students</h2>
+                <p class="modal-subtitle">Bulk register students using CSV file</p>
+            </div>
+            
+            <div id="studentMessage" class="message"></div>
+            
+            <div class="file-upload-area" onclick="document.getElementById('csvFile').click()">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text" id="studentUploadText">Click to select CSV file</div>
+                <div class="upload-hint">Format: name, email, password, college, city, role</div>
+            </div>
+            
+            <input type="file" id="csvFile" accept=".csv" />
+            <button class="btn" id="uploadBtn">Upload & Register Students</button>
+        </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quizModal" class="modal">
+        <div class="modal-content glass">
+            <span class="close" onclick="closeQuizModal()">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title">Create Quiz</h2>
+                <p class="modal-subtitle">Configure your new quiz settings</p>
+            </div>
+            
+            <div id="quizMessage" class="message"></div>
+            
+            <form id="quizForm">
+                <div class="form-group">
+                    <input type="text" id="topic" class="form-input" placeholder="Quiz Topic" required />
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="number" id="topic_id" class="form-input" placeholder="Topic ID" required />
+                    </div>
+                    <div class="form-group">
+                        <input type="number" id="no_of_questions" class="form-input" placeholder="Questions" required />
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="number" id="time_seconds" class="form-input" placeholder="Time (seconds)" required />
+                    </div>
+                    <div class="form-group">
+                        <input type="number" id="points_per_question" class="form-input" placeholder="Points/Q" required />
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="number" id="total_points" class="form-input" placeholder="Total Points" required />
+                </div>
+                
+                <button type="submit" class="btn">Create Quiz</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quiz Success Modal -->
+    <div id="quizSuccessModal" class="modal">
+        <div class="modal-content glass">
+            <div style="text-align: center;">
+                <div class="success-icon">✅</div>
+                <h2 class="success-title">Quiz Created Successfully!</h2>
+                <p class="success-message">Your quiz "<span id="createdQuizTopic"></span>" has been created. Would you like to add questions now?</p>
+                
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="closeQuizSuccessModal()">Later</button>
+                    <button class="btn" onclick="addQuestionsNow()">Add Questions</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Modal -->
+    <div id="companyModal" class="modal">
+        <div class="modal-content glass">
+            <span class="close" onclick="closeCompanyModal()">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title">Upload Companies</h2>
+                <p class="modal-subtitle">Add company visits and recruitment data</p>
+            </div>
+            
+            <div id="companyMessage" class="message"></div>
+            
+            <div class="file-upload-area" onclick="document.getElementById('companyCsvFile').click()">
+                <div class="upload-icon">🏢</div>
+                <div class="upload-text" id="companyUploadText">Click to select CSV file</div>
+                <div class="upload-hint">Format: company_name, company_code, industry, visit_date, job_role, etc.</div>
+            </div>
+            
+            <input type="file" id="companyCsvFile" accept=".csv" />
+            <button class="btn" id="uploadCompanyBtn">Upload & Add Companies</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = "https://localhost:5080/";
+       // const API_BASE_URL = "https://primarykey-production-6114.up.railway.app/";
+
+        // Theme Toggle
+        const themeIcon = document.querySelector('.theme-icon');
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Modal Functions
+        function openStudentModal() { document.getElementById('studentModal').classList.add('active'); }
+        function closeStudentModal() { document.getElementById('studentModal').classList.remove('active'); }
+        function openQuizModal() { document.getElementById('quizModal').classList.add('active'); }
+        function closeQuizModal() { document.getElementById('quizModal').classList.remove('active'); }
+        function openCompanyModal() { document.getElementById('companyModal').classList.add('active'); }
+        function closeCompanyModal() { document.getElementById('companyModal').classList.remove('active'); }
+        function openQuizSuccessModal(topic) {
+            document.getElementById('createdQuizTopic').textContent = topic;
+            document.getElementById('quizSuccessModal').classList.add('active');
+        }
+        function closeQuizSuccessModal() { document.getElementById('quizSuccessModal').classList.remove('active'); }
+
+        // Navigation
+        function navigateToQuizHistory() { window.location.href = 'quiz-history.html'; }
+        function navigateToLeaderboard() { window.location.href = 'entireleaderboard.html'; }
+        function navigateToExperiences() { window.location.href = 'experiences.html'; }
+        function fetchUsers() { window.location.href = 'fetchUsers.html'; }
+        function postAnnouncement() { window.location.href = 'announcement.html'; }
+        function preperationKit() { window.location.href = 'preperationkit.html'; }
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = "../auth/registration.html";
+        }
+
+        function addQuestionsNow() {
+            closeQuizSuccessModal();
+            const params = new URLSearchParams({
+                quiz_id: window.currentQuizData.quiz_id,
+                topic: window.currentQuizData.topic,
+                topic_id: window.currentQuizData.topic_id,
+                no_of_questions: window.currentQuizData.no_of_questions,
+                points_per_question: window.currentQuizData.points_per_question
+            });
+            window.location.href = `add-questions.html?${params.toString()}`;
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // File Upload Handlers
+        const csvFile = document.getElementById('csvFile');
+        const companyCsvFile = document.getElementById('companyCsvFile');
+
+        csvFile.addEventListener('change', () => {
+            const fileName = csvFile.files[0]?.name;
+            if (fileName) {
+                document.getElementById('studentUploadText').textContent = `Selected: ${fileName}`;
+            }
+        });
+
+        companyCsvFile.addEventListener('change', () => {
+            const fileName = companyCsvFile.files[0]?.name;
+            if (fileName) {
+                document.getElementById('companyUploadText').textContent = `Selected: ${fileName}`;
+            }
+        });
+
+        function showMessage(elementId, message, type) {
+            const messageEl = document.getElementById(elementId);
+            messageEl.textContent = message;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Student Upload
+        document.getElementById("uploadBtn").addEventListener("click", () => {
+            const file = csvFile.files[0];
+
+            if (!file) {
+                showMessage('studentMessage', 'Please select a CSV file first.', 'error');
+                return;
+            }
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: async function(results) {
+                    const users = results.data;
+                    let successCount = 0;
+                    let failCount = 0;
+
+                    for (const user of users) {
+                        try {
+                            const response = await fetch(`${API_BASE_URL}api/auth/register`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${localStorage.getItem("authToken") || ''}`
+                                },
+                                body: JSON.stringify({
+                                    name: user.name,
+                                    email: user.email,
+                                    password: user.password,
+                                    college: user.college,
+                                    city: user.city,
+                                    role: user.role || "user"
+                                })
+                            });
+
+                            if (response.ok) {
+                                successCount++;
+                            } else {
+                                failCount++;
+                            }
+                        } catch (error) {
+                            failCount++;
+                        }
+                    }
+
+                    showMessage('studentMessage', 
+                        `Registration completed! ✅ Success: ${successCount}, ❌ Failed: ${failCount}`, 
+                        successCount > 0 ? 'success' : 'error');
+                }
+            });
+        });
+
+        // Quiz Creation
+        document.getElementById("quizForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const topic = document.getElementById("topic").value;
+            const topic_id = document.getElementById("topic_id").value;
+            const no_of_questions = document.getElementById("no_of_questions").value;
+            const time_seconds = document.getElementById("time_seconds").value;
+            const points_per_question = document.getElementById("points_per_question").value;
+            const total_points = document.getElementById("total_points").value;
+            const college_id = localStorage.getItem("college_id");
+
+            try {
+                const response = await fetch(`${API_BASE_URL}api/quizzes/insert`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("authToken") || ''}`
+                    },
+                    body: JSON.stringify({
+                        topic,
+                        topic_id,
+                        no_of_questions,
+                        time_seconds,
+                        points_per_question,
+                        total_points,
+                        college_id
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    window.currentQuizData = {
+                        topic: topic,
+                        topic_id: topic_id,
+                        quiz_id: data.quiz_id || data.id,
+                        no_of_questions: no_of_questions,
+                        time_seconds: time_seconds,
+                        points_per_question: points_per_question,
+                        total_points: total_points
+                    };
+
+                    closeQuizModal();
+                    document.getElementById("quizForm").reset();
+                    openQuizSuccessModal(topic);
+                    
+                } else {
+                    showMessage('quizMessage', 'Failed to create quiz: ' + data.message, 'error');
+                }
+            } catch (err) {
+                showMessage('quizMessage', 'Error creating quiz. Please try again.', 'error');
+            }
+        });
+
+        // Company Upload
+        document.getElementById("uploadCompanyBtn").addEventListener("click", () => {
+            const file = companyCsvFile.files[0];
+
+            if (!file) {
+                showMessage('companyMessage', 'Please select a CSV file first.', 'error');
+                return;
+            }
+
+            let college_id = localStorage.getItem("college_id");
+            
+            if (!college_id || college_id === 'undefined' || college_id === 'null') {
+                college_id = prompt("Enter your College ID:");
+                
+                if (!college_id || isNaN(college_id)) {
+                    showMessage('companyMessage', 'Valid College ID is required.', 'error');
+                    return;
+                }
+                
+                localStorage.setItem("college_id", college_id);
+            }
+
+            college_id = parseInt(college_id);
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: async function(results) {
+                    const companies = results.data;
+                    let successCount = 0;
+                    let failCount = 0;
+
+                    for (const company of companies) {
+                        try {
+                            const cleanedData = {
+                                company_name: company.company_name?.trim(),
+                                company_code: company.company_code?.trim(),
+                                industry: company.industry?.trim() || null,
+                                logo_url: company.logo_url?.trim() || null,
+                                website_url: company.website_url?.trim() || null,
+                                visit_date: company.visit_date?.trim(),
+                                job_role: company.job_role?.trim() || null,
+                                package_offered: company.package_offered ? parseFloat(company.package_offered) : null,
+                                eligibility_criteria: company.eligibility_criteria?.trim() || null,
+                                visit_status: company.visit_status?.trim() || 'Scheduled',
+                                college_id: college_id
+                            };
+
+                            if (!cleanedData.company_name || !cleanedData.company_code || !cleanedData.visit_date) {
+                                failCount++;
+                                continue;
+                            }
+
+                            const response = await fetch(`${API_BASE_URL}api/companies/upload`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${localStorage.getItem("authToken") || ''}`
+                                },
+                                body: JSON.stringify(cleanedData)
+                            });
+
+                            if (response.ok) {
+                                successCount++;
+                            } else {
+                                failCount++;
+                            }
+                        } catch (error) {
+                            failCount++;
+                        }
+                    }
+
+                    showMessage('companyMessage', 
+                        `Upload completed! ✅ Success: ${successCount}, ❌ Failed: ${failCount}`, 
+                        successCount > 0 ? 'success' : 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

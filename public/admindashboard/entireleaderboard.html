@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Leaderboard - Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --secondary: #06b6d4;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --gold: #ffd700;
+      --silver: #c0c0c0;
+      --bronze: #cd7f32;
+      --bg-dark: #0a0f1e;
+      --bg-darker: #050911;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.75);
+      --text-muted: rgba(255, 255, 255, 0.5);
+      --glow: rgba(79, 70, 229, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-darker);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .gradient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.4;
+      background: radial-gradient(circle at 20% 50%, var(--primary) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, var(--secondary) 0%, transparent 50%),
+                  radial-gradient(circle at 40% 20%, var(--accent) 0%, transparent 50%);
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.5;
+      z-index: 1;
+      animation: float 25s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 500px;
+      height: 500px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      top: -150px;
+      left: -150px;
+    }
+
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      bottom: -100px;
+      right: -100px;
+      animation-delay: 8s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(80px, -80px); }
+      66% { transform: translate(-80px, 80px); }
+    }
+
+    .glass {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 32px 80px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeInUp 0.8s ease;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(40px, 8vw, 72px);
+      font-weight: 900;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--gold), var(--warning));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .page-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+      animation: fadeInUp 0.8s ease 0.2s backwards;
+    }
+
+    .stat-card {
+      padding: 32px;
+      border-radius: 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .stat-card.primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+    }
+
+    .stat-card.secondary {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+
+    .stat-card.success {
+      background: linear-gradient(135deg, var(--success), #38b2ac);
+    }
+
+    .stat-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 48px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      color: white;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-card p {
+      font-size: 16px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.95);
+      position: relative;
+      z-index: 1;
+    }
+
+    .controls {
+      margin-bottom: 32px;
+      animation: fadeInUp 0.8s ease 0.4s backwards;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 20px 24px;
+      border: 2px solid var(--card-border);
+      border-radius: 16px;
+      font-size: 16px;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--glow);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .leaderboard {
+      border-radius: 24px;
+      overflow: hidden;
+      animation: fadeInUp 0.8s ease 0.6s backwards;
+    }
+
+    .leaderboard-header {
+      display: grid;
+      grid-template-columns: 80px 1fr 120px;
+      gap: 20px;
+      padding: 24px 32px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .entry {
+      display: grid;
+      grid-template-columns: 80px 1fr 120px;
+      gap: 20px;
+      padding: 24px 32px;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      margin-bottom: 12px;
+      border-radius: 16px;
+      align-items: center;
+      transition: all 0.3s ease;
+      animation: slideIn 0.5s ease backwards;
+    }
+
+    .entry:nth-child(1) { animation-delay: 0.7s; }
+    .entry:nth-child(2) { animation-delay: 0.75s; }
+    .entry:nth-child(3) { animation-delay: 0.8s; }
+    .entry:nth-child(4) { animation-delay: 0.85s; }
+    .entry:nth-child(5) { animation-delay: 0.9s; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .entry:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateX(8px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .entry.top-performer {
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid var(--card-border);
+    }
+
+    .entry.rank-1 {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+      border-color: var(--gold);
+    }
+
+    .entry.rank-2 {
+      background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(192, 192, 192, 0.05));
+      border-color: var(--silver);
+    }
+
+    .entry.rank-3 {
+      background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(205, 127, 50, 0.05));
+      border-color: var(--bronze);
+    }
+
+    .rank {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      text-align: center;
+      color: var(--text-primary);
+    }
+
+    .rank.gold { color: var(--gold); text-shadow: 0 0 20px var(--gold); }
+    .rank.silver { color: var(--silver); text-shadow: 0 0 20px var(--silver); }
+    .rank.bronze { color: var(--bronze); text-shadow: 0 0 20px var(--bronze); }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 20px;
+      color: white;
+      flex-shrink: 0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .name {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .college {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .coins {
+      text-align: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 800;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .coins-icon {
+      font-size: 28px;
+      filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.4));
+    }
+
+    .loading, .error, .no-data {
+      text-align: center;
+      padding: 80px 40px;
+      border-radius: 24px;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid var(--card-border);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 1s linear infinite;
+      margin-bottom: 24px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 2px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    .no-data {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+    }
+
+    .no-data-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 20px 60px;
+      }
+
+      .page-title {
+        font-size: 48px;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .leaderboard-header, .entry {
+        grid-template-columns: 60px 1fr 100px;
+        padding: 16px 20px;
+        gap: 12px;
+      }
+
+      .avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+      }
+
+      .name {
+        font-size: 16px;
+      }
+
+      .rank {
+        font-size: 24px;
+      }
+
+      .coins {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="container">
+    <div class="header">
+      <h1 class="page-title">
+        <span>🏆</span>
+        <span>College Leaderboard</span>
+      </h1>
+      <p class="page-subtitle">All students ranked by performance</p>
+    </div>
+
+    <!-- <div class="stats">
+      <div class="stat-card primary">
+        <h3 id="totalStudents">0</h3>
+        <p>Total Students</p>
+      </div>
+      <div class="stat-card secondary">
+        <h3 id="activeStudents">0</h3>
+        <p>Active Students</p>
+      </div>
+      <div class="stat-card success">
+        <h3 id="totalPoints">0</h3>
+        <p>Total Points Earned</p>
+      </div>
+    </div> -->
+
+    <div class="controls">
+      <input 
+        type="text" 
+        id="searchInput" 
+        class="search-input glass" 
+        placeholder="🔍 Search by student name..."
+      >
+    </div>
+
+    <div class="leaderboard">
+      <div class="leaderboard-header">
+        <div>Rank</div>
+        <div>Student</div>
+        <div>Points</div>
+      </div>
+      <div id="leaderboardList">
+        <div class="loading glass">
+          <div class="loading-spinner"></div>
+          <p style="color: var(--text-secondary); font-size: 18px; font-weight: 600;">Loading leaderboard...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = "http://localhost:5000/api";
+  //  const API_BASE_URL = "https://primarykey-production-6114.up.railway.app/api";
+    const token = localStorage.getItem('authToken');
+    const collegeId = localStorage.getItem('college_id');
+    
+    const leaderboardList = document.getElementById('leaderboardList');
+    const searchInput = document.getElementById('searchInput');
+    
+    let allStudents = [];
+    let filteredStudents = [];
+
+    function getAvatarInitials(name) {
+      return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+    }
+
+    function generateAvatarColor(name) {
+      const colors = [
+        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+        'linear-gradient(135deg, #30cfd0 0%, #330867 100%)'
+      ];
+      
+      const hash = name.split('').reduce((a, b) => {
+        a = ((a << 5) - a) + b.charCodeAt(0);
+        return a & a;
+      }, 0);
+      
+      return colors[Math.abs(hash) % colors.length];
+    }
+
+    function getRankIcon(position) {
+      switch(position) {
+        case 1: return '🥇';
+        case 2: return '🥈';
+        case 3: return '🥉';
+        default: return `#${position}`;
+      }
+    }
+
+    function getRankClass(position) {
+      if (position === 1) return 'gold';
+      if (position === 2) return 'silver';
+      if (position === 3) return 'bronze';
+      return '';
+    }
+
+    function updateStats() {
+      const totalStudents = allStudents.length;
+      const activeStudents = allStudents.filter(s => s.total_points > 0).length;
+      const totalPoints = allStudents.reduce((sum, s) => sum + (s.total_points || 0), 0);
+
+      // document.getElementById('totalStudents').textContent = totalStudents;
+      // document.getElementById('activeStudents').textContent = activeStudents;
+      // document.getElementById('totalPoints').textContent = totalPoints.toLocaleString();
+    }
+
+    async function fetchAllStudents() {
+      try {
+        showLoading();
+
+        const url = `${API_BASE_URL}/leaderboard/my-college`;
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: Failed to fetch leaderboard`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+          allStudents = data.leaderboard || [];
+          filteredStudents = [...allStudents];
+          updateStats();
+          renderLeaderboard();
+        } else {
+          throw new Error(data.error || 'Failed to load leaderboard');
+        }
+
+      } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        showError(error.message);
+      }
+    }
+
+    function showLoading() {
+      leaderboardList.innerHTML = `
+        <div class="loading glass">
+          <div class="loading-spinner"></div>
+          <p style="color: var(--text-secondary); font-size: 18px; font-weight: 600;">Loading leaderboard...</p>
+        </div>
+      `;
+    }
+
+    function showError(message) {
+      leaderboardList.innerHTML = `
+        <div class="error glass">
+          <h3 style="font-size: 28px; margin-bottom: 16px;">⚠️ Error</h3>
+          <p style="font-size: 16px;">${message}</p>
+        </div>
+      `;
+    }
+
+    function renderLeaderboard() {
+      leaderboardList.innerHTML = '';
+
+      if (filteredStudents.length === 0) {
+        leaderboardList.innerHTML = `
+          <div class="no-data glass">
+            <div class="no-data-icon">📭</div>
+            <h3 style="font-size: 28px; margin-bottom: 16px; color: var(--text-primary);">No students found</h3>
+            <p style="color: var(--text-secondary); font-size: 16px;">${searchInput.value ? 'Try a different search term' : 'No students in the leaderboard yet'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      filteredStudents.forEach((user, index) => {
+        const position = index + 1;
+        const entry = document.createElement('div');
+        entry.className = 'entry glass';
+        
+        if (position <= 3) {
+          entry.classList.add('top-performer', `rank-${position}`);
+        }
+        
+        entry.innerHTML = `
+          <div class="rank ${getRankClass(position)}">
+            ${getRankIcon(position)}
+          </div>
+          <div class="user-info">
+            <div class="avatar" style="background: ${generateAvatarColor(user.name)}">
+              ${getAvatarInitials(user.name)}
+            </div>
+            <div>
+              <div class="name">${user.name}</div>
+              <div class="college">${user.college_name || 'Unknown College'}</div>
+            </div>
+          </div>
+          <div class="coins">
+            <span>${user.total_points || 0}</span>
+            <span class="coins-icon">🪙</span>
+          </div>
+        `;
+        
+        leaderboardList.appendChild(entry);
+      });
+    }
+
+    function handleSearch(searchTerm) {
+      searchTerm = searchTerm.toLowerCase().trim();
+      
+      if (!searchTerm) {
+        filteredStudents = [...allStudents];
+      } else {
+        filteredStudents = allStudents.filter(student => 
+          student.name.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      renderLeaderboard();
+    }
+
+    searchInput.addEventListener('input', (e) => {
+      handleSearch(e.target.value);
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!token) {
+        showError('Please login to view the leaderboard');
+        return;
+      }
+      
+      await fetchAllStudents();
+    });
+
+    setInterval(() => {
+      if (token) {
+        fetchAllStudents();
+      }
+    }, 60000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<header class="app-header">
+    <style>
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+        
+        .logo-text {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #0284c7, #0ea5e9, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            text-transform: lowercase;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .logo-text::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #0284c7, #06b6d4);
+            transition: width 0.3s ease;
+        }
+        
+        .header-logo:hover .logo-text {
+            letter-spacing: 0px;
+            transform: translateY(-2px);
+        }
+
+        .header-logo:hover .logo-text::after {
+            width: 100%;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo-text {
+                font-size: 22px;
+            }
+        }
+    </style>
+
+    <div class="header-left">
+        <a href="#" class="header-logo" id="logoLink">
+            <div class="logo-container">
+                <span class="logo-text">primarykey</span>
+            </div>
+        </a>
+    </div>
+
+    <div class="header-right">
+        <div class="header-profile" id="headerProfile">
+            <div class="profile-avatar" id="profileAvatar">U</div>
+            <div class="profile-info">
+                <span class="profile-name" id="profileName">User Name</span>
+                <span class="profile-role" id="profileRole">user</span>
+            </div>
+        </div>
+
+        <button class="header-btn" id="themeToggle" title="Toggle theme">
+            <span class="theme-icon" id="themeIcon">🌙</span>
+        </button>
+
+        <button class="header-btn logout-btn" id="logoutBtn" title="Logout">
+            🚪
+        </button>
+    </div>
+
+    <div class="profile-dropdown" id="profileDropdown">
+        <a href="#" class="dropdown-item" id="viewProfile">
+            <span>👤</span>
+            <span>View Profile</span>
+        </a>
+        <a href="#" class="dropdown-item" id="settings">
+            <span>⚙️</span>
+            <span>Settings</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item" id="dropdownLogout">
+            <span>🚪</span>
+            <span>Logout</span>
+        </a>
+    </div>
+</header>
+
+<script>
+    (function() {
+        const logoLink = document.getElementById('logoLink');
+        if (logoLink) {
+            const currentPath = window.location.pathname;
+            
+            // Always navigate to dashboard based on folder structure
+            if (currentPath.includes('/Quizzes/') || 
+                currentPath.includes('/Companies/') || 
+                currentPath.includes('/InterviewExperience/') ||
+                currentPath.includes('/leaderboard/') ||
+                currentPath.includes('/preperationkit/') ||
+                currentPath.includes('/announcements/')) {
+                // In subfolder - go up two levels
+                logoLink.href = '../../dashboard/dashboard.html';
+            } else if (currentPath.includes('/dashboard/')) {
+                // Already in dashboard folder
+                logoLink.href = './dashboard.html';
+            } else if (currentPath.includes('/auth/') ||
+                       currentPath.includes('/admindashboard/')) {
+                // In sibling folder - go up one level
+                logoLink.href = '../dashboard/dashboard.html';
+            } else {
+                // Default
+                logoLink.href = './dashboard/dashboard.html';
+            }
+        }
+    })();
+</script>

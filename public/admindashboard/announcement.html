@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    (function () {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+    })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements - Admin Panel</title>
+    <link rel="icon" type="image/png" href="../../logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0d47a1 100%);
+            --secondary-bg: rgba(13, 71, 161, 0.1);
+            --card-bg: rgba(26, 26, 46, 0.3);
+            --card-border: rgba(13, 71, 161, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --btn-gradient: linear-gradient(135deg, #0d47a1, #1976d2);
+            --btn-hover-shadow: rgba(0, 0, 0, 0.3);
+            --shape-bg: rgba(13, 71, 161, 0.1);
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --info-color: #64b5f6;
+            --danger-color: #f44336;
+        }
+
+        [data-theme="light"] {
+            --primary-bg: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 25%, #90caf9 50%, #64b5f6 75%, #2196f3 100%);
+            --secondary-bg: rgba(33, 150, 243, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.4);
+            --card-border: rgba(33, 150, 243, 0.3);
+            --text-primary: #1a1a2e;
+            --text-secondary: rgba(26, 26, 46, 0.8);
+            --text-muted: rgba(26, 26, 46, 0.6);
+            --btn-gradient: linear-gradient(135deg, #2196f3, #1976d2);
+            --btn-hover-shadow: rgba(0, 0, 0, 0.2);
+            --shape-bg: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--shape-bg);
+            backdrop-filter: blur(10px);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) { width: 80px; height: 80px; top: 20%; left: 10%; animation-delay: 0s; }
+        .shape:nth-child(2) { width: 120px; height: 120px; top: 60%; right: 15%; animation-delay: 2s; }
+        .shape:nth-child(3) { width: 60px; height: 60px; bottom: 20%; left: 20%; animation-delay: 4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 20px;
+            z-index: 100;
+        }
+
+        .back-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px var(--btn-hover-shadow);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-icon { font-size: 20px; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .page-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+        }
+
+        .controls-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .filters-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .filter-input {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .filter-input {
+            cursor: text;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            border-color: var(--info-color);
+            box-shadow: 0 0 20px rgba(100, 181, 246, 0.2);
+        }
+
+        .create-announcement-btn {
+            padding: 15px 30px;
+            background: var(--btn-gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .create-announcement-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px var(--btn-hover-shadow);
+        }
+
+        .announcements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .announcement-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .announcement-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .announcement-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--btn-gradient);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .announcement-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success-color);
+        }
+
+        .status-inactive {
+            background: rgba(158, 158, 158, 0.2);
+            color: var(--text-muted);
+        }
+
+        .announcement-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .announcement-content {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .announcement-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: rgba(100, 181, 246, 0.2);
+            color: var(--info-color);
+        }
+
+        .delete-btn {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--danger-color);
+        }
+
+        .toggle-btn {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning-color);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            animation: modalSlideIn 0.3s ease forwards;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        @keyframes modalSlideIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: var(--text-muted);
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            color: var(--text-primary);
+            transform: scale(1.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--secondary-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-input:focus {
+            border-color: var(--info-color);
+            box-shadow: 0 0 20px rgba(100, 181, 246, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .image-upload-area {
+            border: 2px dashed var(--card-border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--secondary-bg);
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--info-color);
+            background: rgba(100, 181, 246, 0.1);
+        }
+
+        .image-upload-area.drag-over {
+            border-color: var(--success-color);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .image-preview {
+            margin-top: 15px;
+            max-width: 100%;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .image-preview.active {
+            display: block;
+        }
+
+        .remove-image-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: var(--danger-color);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .remove-image-btn.active {
+            display: inline-block;
+        }
+
+        .remove-image-btn:hover {
+            opacity: 0.8;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--btn-gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: var(--success-color);
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            color: var(--danger-color);
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading::before {
+            content: '';
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--info-color);
+            border-radius: 50%;
+            display: inline-block;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-announcements {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+        }
+
+        .no-announcements-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .no-announcements-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .no-announcements-text {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 36px;
+            }
+            
+            .controls-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .announcements-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <a href="admindashboard.html" class="back-button" title="Back to Dashboard">←</a>
+
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <span class="theme-icon">🌓</span>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Announcement Management</h1>
+            <p class="page-subtitle">Create, manage and monitor college announcements</p>
+        </div>
+
+        <div class="controls-section">
+            <div class="filters-section">
+                <select class="filter-select" id="monthFilter" onchange="filterAnnouncements()">
+                    <option value="">All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <input type="number" class="filter-input" id="yearFilter" placeholder="Year" min="2020" max="2030" onchange="filterAnnouncements()">
+                <select class="filter-select" id="statusFilter" onchange="filterAnnouncements()">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <button class="create-announcement-btn" onclick="openCreateModal()">+ Create Announcement</button>
+        </div>
+
+        <div id="announcementsContainer">
+            <div class="loading">Loading announcements...</div>
+        </div>
+    </div>
+
+    <div id="announcementModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Create Announcement</h2>
+                <p class="modal-subtitle" id="modalSubtitle">Share important updates with students</p>
+            </div>
+            
+            <div id="modalMessage" class="message"></div>
+            
+            <form id="announcementForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label" for="title">Title</label>
+                    <input type="text" id="title" class="form-input" placeholder="Enter announcement title" required maxlength="255">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="content">Content</label>
+                    <textarea id="content" class="form-input form-textarea" placeholder="Enter announcement content" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Image (Optional)</label>
+                    <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('imageInput').click()">
+                        <div class="upload-icon">📸</div>
+                        <div class="upload-text">Click to upload or drag & drop image</div>
+                        <div class="upload-text" style="font-size: 12px; margin-top: 5px;">Max size: 5MB</div>
+                    </div>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+                    <img id="imagePreview" class="image-preview" alt="Preview">
+                    <button type="button" id="removeImageBtn" class="remove-image-btn" onclick="removeImage()">Remove Image</button>
+                </div>
+                
+                <button type="submit" class="btn" id="submitBtn">Create Announcement</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+      //  const API_BASE_URL = "https://primarykey-production-6114.up.railway.app/";
+    const API_BASE_URL = "http://localhost:5000/";
+        let currentAnnouncements = [];
+        let editingAnnouncementId = null;
+        let selectedImage = null;
+
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            try {
+                sessionStorage.setItem('theme', newTheme);
+            } catch (e) {
+                console.log('Theme preference could not be saved');
+            }
+        }
+
+        function loadSavedTheme() {
+            try {
+                const savedTheme = sessionStorage.getItem('theme');
+                if (savedTheme) {
+                    document.body.setAttribute('data-theme', savedTheme);
+                }
+            } catch (e) {
+                console.log('Could not load saved theme');
+            }
+        }
+
+        loadSavedTheme();
+
+        function openCreateModal() {
+            editingAnnouncementId = null;
+            selectedImage = null;
+            document.getElementById('modalTitle').textContent = 'Create Announcement';
+            document.getElementById('modalSubtitle').textContent = 'Share important updates with students';
+            document.getElementById('submitBtn').textContent = 'Create Announcement';
+            document.getElementById('announcementForm').reset();
+            document.getElementById('imagePreview').classList.remove('active');
+            document.getElementById('removeImageBtn').classList.remove('active');
+            document.getElementById('announcementModal').classList.add('active');
+        }
+
+        function openEditModal(announcement) {
+            editingAnnouncementId = announcement.announcement_id;
+            selectedImage = null;
+            document.getElementById('modalTitle').textContent = 'Edit Announcement';
+            document.getElementById('modalSubtitle').textContent = 'Update your announcement details';
+            document.getElementById('submitBtn').textContent = 'Update Announcement';
+            
+            document.getElementById('title').value = announcement.title || '';
+            document.getElementById('content').value = announcement.content || '';
+            
+            if (announcement.image_url) {
+                document.getElementById('imagePreview').src = API_BASE_URL + announcement.image_url.substring(1);
+                document.getElementById('imagePreview').classList.add('active');
+                document.getElementById('removeImageBtn').classList.add('active');
+            } else {
+                document.getElementById('imagePreview').classList.remove('active');
+                document.getElementById('removeImageBtn').classList.remove('active');
+            }
+            
+            document.getElementById('announcementModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('announcementModal').classList.remove('active');
+            document.getElementById('modalMessage').style.display = 'none';
+        }
+
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('modalMessage');
+            messageEl.textContent = message;
+            messageEl.className = `message ${type}`;
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function getAuthToken() {
+            try {
+                return sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+            } catch (e) {
+                return 'demo-token';
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Date not available';
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return 'Invalid date';
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (error) {
+                return 'Invalid date';
+            }
+        }
+
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showMessage('Image size must be less than 5MB', 'error');
+                    return;
+                }
+                selectedImage = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreview').classList.add('active');
+                    document.getElementById('removeImageBtn').classList.add('active');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage() {
+            selectedImage = null;
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreview').classList.remove('active');
+            document.getElementById('removeImageBtn').classList.remove('active');
+        }
+
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('imageUploadArea');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                document.getElementById('imageInput').files = dataTransfer.files;
+                handleImageSelect({ target: { files: [file] } });
+            }
+        });
+
+        function createAnnouncementCard(announcement) {
+            const announcementId = announcement.announcement_id || announcement.id || 0;
+            const isActive = announcement.is_active === 1 || announcement.is_active === true;
+            const title = announcement.title || 'Untitled';
+            const content = announcement.content || 'No content available';
+            const createdAt = announcement.created_at || new Date().toISOString();
+            const imageUrl = announcement.image_url ? API_BASE_URL + announcement.image_url.substring(1) : null;
+            
+            const statusClass = isActive ? 'status-active' : 'status-inactive';
+            const statusText = isActive ? 'Active' : 'Inactive';
+            
+            return `
+                <div class="announcement-card">
+                    <div class="card-header">
+                        <div class="status-badge ${statusClass}">${statusText}</div>
+                    </div>
+                    ${imageUrl ? `<img src="${imageUrl}" alt="${title}" class="announcement-image" onerror="this.style.display='none'">` : ''}
+                    <h3 class="announcement-title">${title}</h3>
+                    <p class="announcement-content">${content}</p>
+                    <div class="card-footer">
+                        <span class="announcement-date">${formatDate(createdAt)}</span>
+                        <div class="card-actions">
+                            <button class="action-btn edit-btn" onclick="editAnnouncement(${announcementId})" title="Edit">✏️</button>
+                            <button class="action-btn toggle-btn" onclick="toggleAnnouncementStatus(${announcementId})" title="${isActive ? 'Deactivate' : 'Activate'}">${isActive ? '👁️' : '🚫'}</button>
+                            <button class="action-btn delete-btn" onclick="deleteAnnouncement(${announcementId})" title="Delete">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayAnnouncements(announcements) {
+            const container = document.getElementById('announcementsContainer');
+            
+            if (!announcements || announcements.length === 0) {
+                container.innerHTML = `
+                    <div class="no-announcements">
+                        <div class="no-announcements-icon">📢</div>
+                        <div class="no-announcements-title">No Announcements Found</div>
+                        <div class="no-announcements-text">Create your first announcement to get started</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const grid = document.createElement('div');
+            grid.className = 'announcements-grid';
+            
+            announcements.forEach(announcement => {
+                grid.innerHTML += createAnnouncementCard(announcement);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(grid);
+        }
+
+        async function fetchAnnouncements() {
+            try {
+                const monthFilter = document.getElementById('monthFilter').value;
+                const yearFilter = document.getElementById('yearFilter').value;
+                const statusFilter = document.getElementById('statusFilter').value;
+                
+                let url = `${API_BASE_URL}api/announcements/admin/all?`;
+                const params = new URLSearchParams();
+                
+                if (monthFilter) params.append('month', monthFilter);
+                if (yearFilter) params.append('year', yearFilter);
+                if (statusFilter) params.append('status', statusFilter);
+                
+                url += params.toString();
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                currentAnnouncements = data.announcements || [];
+                displayAnnouncements(currentAnnouncements);
+
+            } catch (error) {
+                console.error('Fetch announcements error:', error);
+                document.getElementById('announcementsContainer').innerHTML = `
+                    <div class="no-announcements">
+                        <div class="no-announcements-icon">❌</div>
+                        <div class="no-announcements-title">Error Loading Announcements</div>
+                        <div class="no-announcements-text">${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function filterAnnouncements() {
+            fetchAnnouncements();
+        }
+
+        function editAnnouncement(announcementId) {
+            const announcement = currentAnnouncements.find(a => 
+                (a.announcement_id || a.id) === announcementId
+            );
+            if (announcement) {
+                openEditModal(announcement);
+            }
+        }
+
+        document.getElementById('announcementForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            
+            if (!title || !content) {
+                showMessage('Please fill in all required fields', 'error');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('content', content);
+                
+                if (selectedImage) {
+                    formData.append('image', selectedImage);
+                }
+
+                const url = editingAnnouncementId 
+                    ? `${API_BASE_URL}api/announcements/${editingAnnouncementId}`
+                    : `${API_BASE_URL}api/announcements`;
+                
+                const method = editingAnnouncementId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(
+                        editingAnnouncementId ? 'Announcement updated successfully!' : 'Announcement created successfully!', 
+                        'success'
+                    );
+                    
+                    setTimeout(() => {
+                        closeModal();
+                        fetchAnnouncements();
+                    }, 1500);
+                } else {
+                    showMessage(data.error || 'Failed to save announcement', 'error');
+                }
+
+            } catch (error) {
+                console.error('Save announcement error:', error);
+                showMessage('Error saving announcement. Please try again.', 'error');
+            }
+        });
+
+        async function toggleAnnouncementStatus(announcementId) {
+            if (!confirm('Are you sure you want to toggle the status of this announcement?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}api/announcements/${announcementId}/toggle-status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    }
+                });
+
+                if (response.ok) {
+                    fetchAnnouncements();
+                } else {
+                    const data = await response.json();
+                    alert('Failed to toggle status: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Error toggling status. Please try again.');
+            }
+        }
+
+        async function deleteAnnouncement(announcementId) {
+            if (!confirm('Are you sure you want to delete this announcement? This action cannot be undone.')) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}api/announcements/${announcementId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    }
+                });
+
+                if (response.ok) {
+                    fetchAnnouncements();
+                } else {
+                    const data = await response.json();
+                    alert('Failed to delete: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Error deleting announcement. Please try again.');
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('announcementModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        window.addEventListener('load', fetchAnnouncements);
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
