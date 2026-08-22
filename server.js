@@ -4,37 +4,33 @@ const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
 
-
 dotenv.config();
 
 const app = express();
-const topicRoutes = require('./routes/topicRoutes');
-const articleRoutes = require('./routes/articleRoutes');
-const tutorialRoutes = require('./routes/tutorialRoutes');
-// Middlewares
+
 app.use(cors());
 app.use(bodyParser.json());
 
-// Routes
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
+
 const authRoutes = require('./routes/authRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
 const companyRoutes = require('./routes/companyRoutes');
 const quizRoutes = require('./routes/quizRoutes');
-//const leaderboardRoutes = require('./routes/leaderboardRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/quizzes', quizRoutes);
-//app.use("/api/leaderboard", leaderboardRoutes);
 
-// Homepage → registration.html
-app.get('/', (req, res) => {
-    res.send('API is running...');
-});
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Start server
+// Open registration page on root URL
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'auth', 'registration.html'));
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, '0.0.0.0', () => {
