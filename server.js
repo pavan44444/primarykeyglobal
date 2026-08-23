@@ -29,7 +29,7 @@ app.use('/api/companies', companyRoutes);
 app.use('/api/tutorials', tutorialRoutes);
 app.use('/api/topics',topicRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
-app.use('/api/profile', profileRoutes);
+app.use('/api', profileRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/articles', articleRoutes);
 
