@@ -414,8 +414,8 @@
   </div>
 
   <script>
-    const API_BASE_URL = "https://primarykeyglobal.onrender.com";
-    const SERVER_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, ''); // ✅ derive image origin from the same base, no hardcoded prod URL
+    const API_BASE_URL = "https://primarykeyglobal.onrender.com/api";
+    //const SERVER_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, ''); // ✅ derive image origin from the same base, no hardcoded prod URL
     const token = localStorage.getItem('authToken');
 
     function resolveAssetUrl(pathFromServer) {
