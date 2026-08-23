@@ -17,13 +17,23 @@ app.use(express.static(path.join(__dirname, 'public')));
 const authRoutes = require('./routes/authRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
 const companyRoutes = require('./routes/companyRoutes');
-const quizRoutes = require('./routes/quizRoutes');
 const tutorialRoutes = require('./routes/tutorialRoutes');
+const topicRoutes = require('./routes/topicRoutes');
+const leaderboardRoutes = require('./routes/leaderboardRoutes');
+const profileRoutes = require('./routes/profileRoutes');
+const quizRoutes = require('./routes/quizRoutes');
+const articleRoutes = require('./routes/articleRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/companies', companyRoutes);
-app.use('/api/quizzes', quizRoutes);
 app.use('/api/tutorials', tutorialRoutes);
+app.use('/api/topics',topicRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/quizzes', quizRoutes);
+app.use('/api/articles', articleRoutes);
+
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Open registration page on root URL
