@@ -15,7 +15,7 @@
     const ROOT = window.PK_ROOT || "../";
 
     const NAV_ITEMS = [
-        { label: "Dashboard", icon: "🏠", href: `${ROOT}Dashboard/dashboard.html`, match: "Dashboard" },
+        { label: "Dashboard", icon: "🏠", href: `${ROOT}dashboard/dashboard.html`, match: "Dashboard" },
    //     { label: "Interview Experiences", icon: "💼", href: `${ROOT}InterviewExperience/view-experiences.html`, match: "InterviewExperience" },
         { label: "tutorials", icon: "🧠", href: `${ROOT}Quizzes/tutorials.html`, match: "tutorials" },
       //  { label: "Campus Companies", icon: "🏢", href: `${ROOT}Companies/companies.html`, match: "Companies" },
