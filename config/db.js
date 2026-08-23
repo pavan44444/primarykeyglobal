@@ -7,6 +7,10 @@ console.log('DB_PORT =', process.env.DB_PORT);
 console.log('DB_NAME =', process.env.DB_NAME);
 console.log('DB_USER =', process.env.DB_USER);
 
+const isProduction =
+    process.env.NODE_ENV === 'production' ||
+    process.env.DB_HOST !== 'localhost';
+
 const db = mysql.createPool({
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
@@ -14,10 +18,12 @@ const db = mysql.createPool({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
 
-    // Required for Aiven MySQL
-    ssl: {
-        rejectUnauthorized: false
-    },
+    // Enable SSL only for production databases
+    ...(isProduction && {
+        ssl: {
+            rejectUnauthorized: false
+        }
+    }),
 
     waitForConnections: true,
     connectionLimit: 10,

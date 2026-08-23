@@ -18,12 +18,12 @@ const authRoutes = require('./routes/authRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
 const companyRoutes = require('./routes/companyRoutes');
 const quizRoutes = require('./routes/quizRoutes');
-
+const tutorialRoutes = require('./routes/tutorialRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/quizzes', quizRoutes);
-
+app.use('/api/tutorials', tutorialRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Open registration page on root URL
