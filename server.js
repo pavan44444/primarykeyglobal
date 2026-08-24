@@ -38,7 +38,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Open registration page on root URL
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'auth', 'registration.html'));
+    res.sendFile(path.join(__dirname, 'public', 'landing.html'));
 });
 
 const PORT = process.env.PORT || 5000;
