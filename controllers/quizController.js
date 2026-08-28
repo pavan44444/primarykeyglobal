@@ -308,6 +308,8 @@ exports.getQuizQuestions = async (req, res) => {
         });
     }
 };
+const { updateUserStreak, checkAndUpdatePrimaryKey } = require("./streakController");
+
 exports.submitQuiz = async (req, res) => {
     try {
         const quizId = req.params.quiz_id;
@@ -418,16 +420,21 @@ exports.submitQuiz = async (req, res) => {
 
         const submissionId = submission.insertId;
 
+        // total_points = quiz points (recomputed from submissions) + accumulated streak bonus_points
         await db.query(
             `UPDATE users 
              SET total_points = (
                  SELECT COALESCE(SUM(points_earned), 0) 
                  FROM quiz_submissions 
                  WHERE user_id = ?
-             )
+             ) + bonus_points
              WHERE user_id = ?`,
             [userId, userId]
         );
+
+        // Streak tracking + primarykey rank check — run after points are finalized
+        const streakResult = await updateUserStreak(userId, pointsEarned);
+        const primaryKeyResult = await checkAndUpdatePrimaryKey();
 
         res.json({
             success: true,
@@ -439,7 +446,9 @@ exports.submitQuiz = async (req, res) => {
                 wrong_answers: wrongAnswers,
                 total_questions: totalQuestions,
                 points_earned: pointsEarned,
-                results: results
+                results: results,
+                streak: streakResult,
+                primaryKey: primaryKeyResult
             }
         });
 

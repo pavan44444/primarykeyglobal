@@ -23,6 +23,7 @@ const leaderboardRoutes = require('./routes/leaderboardRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const articleRoutes = require('./routes/articleRoutes');
+const streakRoutes = require('./routes/streakRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/companies', companyRoutes);
@@ -32,6 +33,7 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api', profileRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/articles', articleRoutes);
+app.use('/api/streak', streakRoutes);
 
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

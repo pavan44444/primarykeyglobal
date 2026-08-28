@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<title>Streak — Primarykey</title>
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/sidebar.css">
+<style>
+  .pk-main {
+    margin-left: 260px; /* adjust to match your sidebar width if different */
+    padding: 40px 24px;
+    max-width: 680px;
+  }
+  .streak-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+  }
+  .streak-summary {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .streak-stat {
+    flex: 1;
+    text-align: center;
+    padding: 18px 12px;
+    border-radius: 12px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+  }
+  .streak-stat .num {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .streak-stat .label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .month-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .month-nav button {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .month-nav button:hover {
+    background: var(--bg-elevated-hover);
+  }
+  .month-nav h3 {
+    color: var(--text-primary);
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  .day-header {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding-bottom: 4px;
+  }
+  .day-cell {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .day-cell.empty {
+    visibility: hidden;
+  }
+  .day-cell.today {
+    border-color: var(--accent);
+    border-width: 2px;
+  }
+  .day-cell .emoji {
+    font-size: 18px;
+    line-height: 1;
+  }
+  .day-cell .num {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .streak-loading, .streak-error {
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+  .streak-error {
+    color: var(--error-text);
+  }
+</style>
+</head>
+<body>
+
+<main class="pk-main">
+  <h1 class="streak-title">Your Streak</h1>
+
+  <div class="streak-summary">
+    <div class="streak-stat">
+      <div class="num" id="currentStreakNum">–</div>
+      <div class="label">Current streak</div>
+    </div>
+    <div class="streak-stat">
+      <div class="num" id="longestStreakNum">–</div>
+      <div class="label">Longest streak</div>
+    </div>
+  </div>
+
+  <div class="month-nav">
+    <button id="prevMonth" aria-label="Previous month">‹</button>
+    <h3 id="monthLabel"></h3>
+    <button id="nextMonth" aria-label="Next month">›</button>
+  </div>
+
+  <div class="calendar-grid" id="calendarGrid"></div>
+  <p id="streakStatus" class="streak-loading">Loading…</p>
+</main>
+
+<script>
+  window.PK_ROOT = "../"; // this page lives at streak/streak.html, one level below root
+</script>
+<script src="../assets/sidebar.js"></script>
+
+<script>
+const API_BASE = ""; // set to your API_BASE_URL if the API isn't same-origin
+const token = localStorage.getItem("token"); // confirm this matches the key your login flow actually sets
+
+let activeDates = new Set();
+let streakRunMap = {};
+let viewYear, viewMonth; // viewMonth is 0-indexed
+
+function parseISODate(str) {
+  const [y, m, d] = str.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+}
+function formatISODate(date) {
+  return date.toISOString().slice(0, 10);
+}
+function diffDays(a, b) {
+  return Math.round((a - b) / 86400000);
+}
+
+function computeStreakRuns(sortedDates) {
+  const map = {};
+  let prevDate = null;
+  let runLength = 0;
+  sortedDates.forEach(dateStr => {
+    const date = parseISODate(dateStr);
+    runLength = (prevDate && diffDays(date, prevDate) === 1) ? runLength + 1 : 1;
+    map[dateStr] = runLength;
+    prevDate = date;
+  });
+  return map;
+}
+
+async function loadStreakData() {
+  const statusEl = document.getElementById('streakStatus');
+  try {
+    const res = await fetch(`${API_BASE}/api/streak/history`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      statusEl.textContent = "Couldn't load streak data.";
+      statusEl.className = "streak-error";
+      return;
+    }
+
+    activeDates = new Set(data.activeDates);
+    streakRunMap = computeStreakRuns(data.activeDates);
+
+    document.getElementById('currentStreakNum').textContent = data.streak.current_streak;
+    document.getElementById('longestStreakNum').textContent = data.streak.longest_streak;
+
+    statusEl.style.display = "none";
+    renderMonth();
+  } catch (err) {
+    console.error("Streak history fetch failed:", err);
+    statusEl.textContent = "Couldn't load streak data.";
+    statusEl.className = "streak-error";
+  }
+}
+
+function emojiForDate(dateStr) {
+  if (!activeDates.has(dateStr)) return null;
+  const runDay = streakRunMap[dateStr];
+  if (runDay % 10 === 0) return '🎉'; // matches the +50 bonus milestone
+  return '🔥';
+}
+
+function renderMonth() {
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '';
+
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  document.getElementById('monthLabel').textContent = `${monthNames[viewMonth]} ${viewYear}`;
+
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'day-header';
+    h.textContent = d;
+    grid.appendChild(h);
+  });
+
+  const firstOfMonth = new Date(Date.UTC(viewYear, viewMonth, 1));
+  const startOffset = firstOfMonth.getUTCDay();
+  const daysInMonth = new Date(Date.UTC(viewYear, viewMonth + 1, 0)).getUTCDate();
+  const todayStr = formatISODate(new Date());
+
+  for (let i = 0; i < startOffset; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'day-cell empty';
+    grid.appendChild(cell);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateObj = new Date(Date.UTC(viewYear, viewMonth, day));
+    const dateStr = formatISODate(dateObj);
+    const cell = document.createElement('div');
+    cell.className = 'day-cell' + (dateStr === todayStr ? ' today' : '');
+
+    const emoji = emojiForDate(dateStr);
+    cell.innerHTML = `
+      ${emoji ? `<span class="emoji">${emoji}</span>` : ''}
+      <span class="num">${day}</span>
+    `;
+    grid.appendChild(cell);
+  }
+}
+
+document.getElementById('prevMonth').addEventListener('click', () => {
+  viewMonth--;
+  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+  renderMonth();
+});
+document.getElementById('nextMonth').addEventListener('click', () => {
+  viewMonth++;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  renderMonth();
+});
+
+const now = new Date();
+viewYear = now.getFullYear();
+viewMonth = now.getMonth();
+
+loadStreakData();
+</script>
+
+</body>
+</html>
