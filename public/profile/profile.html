@@ -174,10 +174,16 @@
       text-align: left;
     }
 
+    /* 3-up grid that also wraps a 2nd row of stats (streaks) without wasting space */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
+    }
+
+    .stats-grid.stats-grid-secondary {
+      margin-top: 10px;
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .stat-box {
@@ -193,6 +199,10 @@
       font-weight: 900;
       color: #0284c7;
       margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
 
     .stat-label {
@@ -382,6 +392,86 @@
       margin-top: 6px;
     }
 
+    /* ===== Compact calendar card (right column) ===== */
+    .calendar-card .section-title {
+      margin-bottom: 12px;
+    }
+
+    .month-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .month-nav button {
+      background: rgba(2, 132, 199, 0.12);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      border-radius: 8px;
+      width: 26px;
+      height: 26px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .month-nav button:hover {
+      background: rgba(2, 132, 199, 0.22);
+    }
+    .month-nav h4 {
+      color: var(--text-primary);
+      font-size: 13.5px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .day-header {
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-muted);
+      padding-bottom: 2px;
+    }
+    .day-cell {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: rgba(2, 132, 199, 0.08);
+      border: 1px solid var(--glass-border);
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+    .day-cell.empty {
+      visibility: hidden;
+    }
+    .day-cell.today {
+      border-color: #0284c7;
+      border-width: 2px;
+    }
+    .day-cell .emoji {
+      font-size: 13px;
+      line-height: 1;
+    }
+    .day-cell .num {
+      font-size: 8.5px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .calendar-status {
+      color: var(--text-secondary);
+      font-size: 12.5px;
+    }
+    .calendar-status.calendar-error {
+      color: var(--error-text);
+    }
+
     @media (max-width: 768px) {
       .profile-grid {
         grid-template-columns: 1fr;
@@ -415,8 +505,14 @@
 
   <script>
     const API_BASE_URL = "https://primarykeyglobal.onrender.com/api";
-    const SERVER_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, ''); // ✅ derive image origin from the same base, no hardcoded prod URL
+    const SERVER_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, ''); // derive image origin from the same base, no hardcoded prod URL
     const token = localStorage.getItem('authToken');
+
+    // ---- Streak/calendar state (mirrors streak.html logic) ----
+    let activeDates = new Set();
+    let streakRunMap = {};
+    let viewYear, viewMonth; // viewMonth is 0-indexed
+    let streakData = null; // { current_streak, longest_streak }
 
     function resolveAssetUrl(pathFromServer) {
       if (!pathFromServer) return null;
@@ -428,6 +524,37 @@
       const div = document.createElement('div');
       div.textContent = str === null || str === undefined ? '' : String(str);
       return div.innerHTML;
+    }
+
+    function parseISODate(str) {
+      const [y, m, d] = str.split('-').map(Number);
+      return new Date(Date.UTC(y, m - 1, d));
+    }
+    function formatISODate(date) {
+      return date.toISOString().slice(0, 10);
+    }
+    function diffDays(a, b) {
+      return Math.round((a - b) / 86400000);
+    }
+
+    function computeStreakRuns(sortedDates) {
+      const map = {};
+      let prevDate = null;
+      let runLength = 0;
+      sortedDates.forEach(dateStr => {
+        const date = parseISODate(dateStr);
+        runLength = (prevDate && diffDays(date, prevDate) === 1) ? runLength + 1 : 1;
+        map[dateStr] = runLength;
+        prevDate = date;
+      });
+      return map;
+    }
+
+    function emojiForDate(dateStr) {
+      if (!activeDates.has(dateStr)) return null;
+      const runDay = streakRunMap[dateStr];
+      if (runDay % 10 === 0) return '🎉'; // matches the +50 bonus milestone
+      return '🔥';
     }
 
     async function fetchProfile() {
@@ -446,27 +573,56 @@
       `;
 
       try {
-        const response = await fetch(`${API_BASE_URL}/profile`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          }
-        });
+        const [profileRes, streakRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/profile`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            }
+          }),
+          fetch(`${API_BASE_URL}/streak/history`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            }
+          }).catch(err => {
+            console.error("Streak history fetch failed:", err);
+            return null; // don't let a streak failure block the whole profile
+          })
+        ]);
 
-        if (!response.ok) {
-          const errData = await response.json().catch(() => ({}));
-          throw new Error(errData.message || `Failed to load profile (status ${response.status})`);
+        if (!profileRes.ok) {
+          const errData = await profileRes.json().catch(() => ({}));
+          throw new Error(errData.message || `Failed to load profile (status ${profileRes.status})`);
         }
 
-        const data = await response.json();
+        const data = await profileRes.json();
         const user = data.user;
 
         if (!user) {
           throw new Error('Profile data was empty. Please try again.');
         }
 
-        renderProfile(user);
+        // Streak data is best-effort: render the profile even if this part fails
+        let streakOk = false;
+        if (streakRes && streakRes.ok) {
+          const sData = await streakRes.json().catch(() => null);
+          if (sData && sData.success) {
+            activeDates = new Set(sData.activeDates || []);
+            streakRunMap = computeStreakRuns(sData.activeDates || []);
+            streakData = sData.streak || { current_streak: 0, longest_streak: 0 };
+            streakOk = true;
+          }
+        }
+
+        const now = new Date();
+        viewYear = now.getFullYear();
+        viewMonth = now.getMonth();
+
+        renderProfile(user, streakOk);
+        if (streakOk) renderMonth();
       } catch (err) {
         console.error(err);
         container.innerHTML = `
@@ -479,7 +635,7 @@
       }
     }
 
-    function renderProfile(user) {
+    function renderProfile(user, streakOk) {
       const container = document.getElementById('profileContent');
 
       const initials = (user.name || '?')
@@ -495,6 +651,9 @@
       const memberSince = user.created_at
         ? new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
         : 'Unknown';
+
+      const currentStreak = streakOk ? (streakData.current_streak ?? 0) : '–';
+      const longestStreak = streakOk ? (streakData.longest_streak ?? 0) : '–';
 
       container.innerHTML = `
         <div class="profile-grid">
@@ -534,6 +693,16 @@
               <div class="stat-box">
                 <div class="stat-value">${escapeHtml(user.average_score ?? '0.00')}</div>
                 <div class="stat-label">Avg Score</div>
+              </div>
+            </div>
+            <div class="stats-grid stats-grid-secondary">
+              <div class="stat-box">
+                <div class="stat-value">🔥 ${escapeHtml(currentStreak)}</div>
+                <div class="stat-label">Current Streak</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value">🏆 ${escapeHtml(longestStreak)}</div>
+                <div class="stat-label">Longest Streak</div>
               </div>
             </div>
           </div>
@@ -577,9 +746,78 @@
               </div>
             </div>
 
+            <!-- SECTION: Activity Calendar -->
+            <div class="profile-card calendar-card">
+              <h3 class="section-title">📅 Activity Calendar</h3>
+              ${streakOk ? `
+                <div class="month-nav">
+                  <button id="prevMonth" aria-label="Previous month">‹</button>
+                  <h4 id="monthLabel"></h4>
+                  <button id="nextMonth" aria-label="Next month">›</button>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+              ` : `
+                <p class="calendar-status calendar-error">Couldn't load activity calendar.</p>
+              `}
+            </div>
+
           </div>
         </div>
       `;
+
+      if (streakOk) {
+        document.getElementById('prevMonth').addEventListener('click', () => {
+          viewMonth--;
+          if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+          renderMonth();
+        });
+        document.getElementById('nextMonth').addEventListener('click', () => {
+          viewMonth++;
+          if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+          renderMonth();
+        });
+      }
+    }
+
+    function renderMonth() {
+      const grid = document.getElementById('calendarGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      document.getElementById('monthLabel').textContent = `${monthNames[viewMonth]} ${viewYear}`;
+
+      ['S','M','T','W','T','F','S'].forEach(d => {
+        const h = document.createElement('div');
+        h.className = 'day-header';
+        h.textContent = d;
+        grid.appendChild(h);
+      });
+
+      const firstOfMonth = new Date(Date.UTC(viewYear, viewMonth, 1));
+      const startOffset = firstOfMonth.getUTCDay();
+      const daysInMonth = new Date(Date.UTC(viewYear, viewMonth + 1, 0)).getUTCDate();
+      const todayStr = formatISODate(new Date());
+
+      for (let i = 0; i < startOffset; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell empty';
+        grid.appendChild(cell);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateObj = new Date(Date.UTC(viewYear, viewMonth, day));
+        const dateStr = formatISODate(dateObj);
+        const cell = document.createElement('div');
+        cell.className = 'day-cell' + (dateStr === todayStr ? ' today' : '');
+
+        const emoji = emojiForDate(dateStr);
+        cell.innerHTML = `
+          ${emoji ? `<span class="emoji">${emoji}</span>` : ''}
+          <span class="num">${day}</span>
+        `;
+        grid.appendChild(cell);
+      }
     }
 
     function toggleEditForm() {

@@ -20,7 +20,7 @@
         { label: "tutorials", icon: "🧠", href: `${ROOT}Quizzes/tutorials.html`, match: "tutorials" },
       //  { label: "Campus Companies", icon: "🏢", href: `${ROOT}Companies/companies.html`, match: "Companies" },
         { label: "Leaderboard", icon: "🏆", href: `${ROOT}leaderboard/leaderboard.html`, match: "leaderboard" },
-         { label: "Streak", icon: "🏆", href: `${ROOT}streak/streak.html`, match: "streak" },
+         { label: "Streak", icon: "📈", href: `${ROOT}streak/streak.html`, match: "streak" },
    //     { label: "Preparation Kit", icon: "📚", href: `${ROOT}preperationkit/preperationkit.html`, match: "preperationkit" },
        // { label: "Announcements", icon: "📢", href: `${ROOT}announcements/announcements.html`, match: "announcements" },
          { label: "profile", icon: "🙎🏻‍♂️", href: `${ROOT}profile/profile.html`, match: "profile" }
