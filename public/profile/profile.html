@@ -414,8 +414,12 @@
       font-size: 14px;
       line-height: 1;
     }
-    .month-nav button:hover {
+    .month-nav button:hover:not(:disabled) {
       background: rgba(2, 132, 199, 0.22);
+    }
+    .month-nav button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
     }
     .month-nav h4 {
       color: var(--text-primary);
@@ -427,7 +431,10 @@
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
+      grid-auto-rows: 1fr;
       gap: 4px;
+      /* fixed height for 6 rows so switching months never scrolls or jumps */
+      height: 190px;
     }
     .day-header {
       text-align: center;
@@ -513,6 +520,10 @@
     let streakRunMap = {};
     let viewYear, viewMonth; // viewMonth is 0-indexed
     let streakData = null; // { current_streak, longest_streak }
+    // Bounds so the calendar only ever shows from the month the user joined
+    // through the current month — no scrolling through empty future/past months.
+    let minYear, minMonth; // month the user joined
+    let maxYear, maxMonth; // current month
 
     function resolveAssetUrl(pathFromServer) {
       if (!pathFromServer) return null;
@@ -618,8 +629,22 @@
         }
 
         const now = new Date();
-        viewYear = now.getFullYear();
-        viewMonth = now.getMonth();
+        maxYear = now.getFullYear();
+        maxMonth = now.getMonth();
+
+        if (user.created_at) {
+          const joinDate = new Date(user.created_at);
+          minYear = joinDate.getFullYear();
+          minMonth = joinDate.getMonth();
+        } else {
+          // No join date available — don't let the calendar wander indefinitely,
+          // just cap it to the current month.
+          minYear = maxYear;
+          minMonth = maxMonth;
+        }
+
+        viewYear = maxYear;
+        viewMonth = maxMonth;
 
         renderProfile(user, streakOk);
         if (streakOk) renderMonth();
@@ -767,11 +792,13 @@
 
       if (streakOk) {
         document.getElementById('prevMonth').addEventListener('click', () => {
+          if (viewYear === minYear && viewMonth === minMonth) return; // already at join month
           viewMonth--;
           if (viewMonth < 0) { viewMonth = 11; viewYear--; }
           renderMonth();
         });
         document.getElementById('nextMonth').addEventListener('click', () => {
+          if (viewYear === maxYear && viewMonth === maxMonth) return; // already at current month
           viewMonth++;
           if (viewMonth > 11) { viewMonth = 0; viewYear++; }
           renderMonth();
@@ -786,6 +813,13 @@
 
       const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
       document.getElementById('monthLabel').textContent = `${monthNames[viewMonth]} ${viewYear}`;
+
+      // Disable navigation past the user's join month or beyond the current month —
+      // no scrolling through months with nothing in them.
+      const prevBtn = document.getElementById('prevMonth');
+      const nextBtn = document.getElementById('nextMonth');
+      if (prevBtn) prevBtn.disabled = (viewYear === minYear && viewMonth === minMonth);
+      if (nextBtn) nextBtn.disabled = (viewYear === maxYear && viewMonth === maxMonth);
 
       ['S','M','T','W','T','F','S'].forEach(d => {
         const h = document.createElement('div');
@@ -816,6 +850,16 @@
           ${emoji ? `<span class="emoji">${emoji}</span>` : ''}
           <span class="num">${day}</span>
         `;
+        grid.appendChild(cell);
+      }
+
+      // Pad to a fixed 6 rows (42 cells incl. the 7 day-headers) so the card's
+      // height stays identical across every month — no layout jump, no scroll.
+      const filledCells = startOffset + daysInMonth;
+      const trailingEmpty = 42 - filledCells;
+      for (let i = 0; i < trailingEmpty; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell empty';
         grid.appendChild(cell);
       }
     }
