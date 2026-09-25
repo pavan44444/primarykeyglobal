@@ -247,6 +247,8 @@ body.has-sidebar {
 
 /* =========================================
    PRIMARYKEY SIDEBAR BRAND
+   FIXED: box now sized to fit the logo's actual aspect ratio
+   (was height:125px fixed + overflow:hidden, clipping the artwork)
 ========================================= */
 
 .pk-sidebar-brand {
@@ -255,9 +257,9 @@ body.has-sidebar {
     justify-content: center;
 
     width: 100%;
-    height: 125px;
+    min-height: 125px;   /* was: height: 125px */
 
-    padding: 10px 12px;
+    padding: 18px 16px;
 
     box-sizing: border-box;
 
@@ -265,32 +267,27 @@ body.has-sidebar {
 
     border-bottom: 1px solid var(--border);
 
-    overflow: hidden;
+    /* overflow: hidden removed — was clipping the logo top/bottom */
 }
 
 .pk-sidebar-logo {
     display: block;
 
-    width: 220px;
+    width: auto;         /* was: width: 220px */
+    height: 64px;         /* constrain by height so it always fits the slot */
     max-width: 100%;
-    height: auto;
 
     object-fit: contain;
 
     /*
-       Your current PNG has a black background.
-       screen makes that dark background visually
-       disappear against the dark sidebar.
+       FIXED: the SVG now has a transparent background (no more baked-in
+       rect), so mix-blend-mode is no longer needed and has been removed —
+       it was washing out the blue gradient against the sidebar background.
     */
-    mix-blend-mode: screen;
 
     transition: transform 0.25s ease;
 }
 
 .pk-sidebar-brand:hover .pk-sidebar-logo {
-    transform: scale(1.04);
-}
-
-.pk-sidebar-brand:hover .pk-sidebar-logo {
-    transform: scale(1.13);
+    transform: scale(1.06);
 }
