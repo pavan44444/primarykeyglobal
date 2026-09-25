@@ -98,7 +98,7 @@
 
             <a href="${ROOT}Dashboard/dashboard.html" class="pk-sidebar-brand">
                 <img
-                    src="${ROOT}assets/primarykey-logo.png"
+                    src="${ROOT}assets/primary-key-logo.svg"
                     alt="PrimaryKey"
                     class="pk-sidebar-logo"
                 />
