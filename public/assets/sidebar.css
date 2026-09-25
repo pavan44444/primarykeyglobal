@@ -247,9 +247,9 @@ body.has-sidebar {
         padding-top: 70px;
     }
 }
-/* =========================================================
-   PRIMARYKEY SIDEBAR LOGO
-   ========================================================= */
+/* ================================
+   PRIMARYKEY SIDEBAR BRAND
+================================ */
 
 .pk-sidebar-brand {
     display: flex;
@@ -257,18 +257,32 @@ body.has-sidebar {
     justify-content: center;
 
     width: 100%;
-    padding: 18px 16px 22px;
+    height: 125px;
+
+    padding: 12px 18px;
 
     text-decoration: none;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-sizing: border-box;
 }
 
 .pk-sidebar-logo {
     display: block;
 
-    width: 170px;
+    width: 205px;
     height: auto;
 
     max-width: 100%;
 
     object-fit: contain;
+
+    /* removes the feeling of a tiny image */
+    transform: scale(1.08);
+
+    transition: transform 0.25s ease;
+}
+
+.pk-sidebar-brand:hover .pk-sidebar-logo {
+    transform: scale(1.13);
 }
