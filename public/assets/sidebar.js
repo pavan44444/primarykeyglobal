@@ -113,9 +113,10 @@
                 <button class="pk-theme-toggle" id="pkThemeToggle" type="button">
                     <span class="pk-footer-icon">◐</span>
 
-                    <span id="pkThemeLabel">
-                        ${isLight ? "Light mode" : "Dark mode"}
-                    </span>
+                    // // <span id="pkThemeLabel">
+                    
+                    //    ${isLight ? "Light mode" : "Dark mode"}
+                    // // </span>
 
                     <span class="pk-toggle-track">
                         <span class="pk-toggle-thumb"></span>
@@ -164,13 +165,13 @@
         overlay.addEventListener("click", closeMenu);
 
         // Theme toggle
-        themeToggle.addEventListener("click", function () {
-            const current = document.documentElement.getAttribute("data-theme") || "dark";
-            const next = current === "dark" ? "light" : "dark";
-            document.documentElement.setAttribute("data-theme", next);
-            localStorage.setItem("theme", next);
-            themeLabel.textContent = next === "light" ? "Light mode" : "Dark mode";
-        });
+        // themeToggle.addEventListener("click", function () {
+        //     const current = document.documentElement.getAttribute("data-theme") || "dark";
+        //     const next = current === "dark" ? "light" : "dark";
+        //     document.documentElement.setAttribute("data-theme", next);
+        //     localStorage.setItem("theme", next);
+        //     themeLabel.textContent = next === "light" ? "Light mode" : "Dark mode";
+        // });
 
         // Logout
         logoutBtn.addEventListener("click", function () {
