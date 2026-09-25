@@ -79,40 +79,62 @@
         }).join("");
     }
 
-    function buildSidebarHTML() {
-        const savedTheme = localStorage.getItem("theme") || "dark";
-        const isLight = savedTheme === "light";
-        return `
-            <div class="pk-sidebar-overlay" id="pkOverlay"></div>
-            <button class="pk-sidebar-trigger" id="pkTrigger" aria-label="Open menu">☰</button>
-            <aside class="pk-sidebar" id="pkSidebar">
-                <a href="${ROOT}Dashboard/dashboard.html" class="pk-sidebar-brand">
-                  <!--  <span class="pk-sidebar-brand-mark">PK</span>-->
-                    <span class="pk-sidebar-brand-text">Primarykey<span></span></span>
-                </a>
-                <nav class="pk-sidebar-nav">
-                    ${buildNavHTML()}
-                </nav>
-               <div class="pk-sidebar-footer">
+  function buildSidebarHTML() {
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    const isLight = savedTheme === "light";
 
-    <button class="pk-theme-toggle" id="pkThemeToggle" type="button">
-        <span class="pk-footer-icon">◐</span>
-        <span id="pkThemeLabel">
-            ${isLight ? "Light mode" : "Dark mode"}
-        </span>
-        <span class="pk-toggle-track">
-            <span class="pk-toggle-thumb"></span>
-        </span>
-    </button>
+    return `
+        <div class="pk-sidebar-overlay" id="pkOverlay"></div>
 
-    <button class="pk-nav-item pk-logout" id="pkLogout" type="button">
-        <span class="pk-nav-icon">⎋</span>
-        <span>Sign out</span>
-    </button>
+        <button
+            class="pk-sidebar-trigger"
+            id="pkTrigger"
+            aria-label="Open menu"
+        >
+            ☰
+        </button>
 
-</div>
-</aside>`;
-    }
+        <aside class="pk-sidebar" id="pkSidebar">
+
+            <a href="${ROOT}Dashboard/dashboard.html" class="pk-sidebar-brand">
+                <img
+                    src="${ROOT}assets/primarykey-logo.png"
+                    alt="PrimaryKey"
+                    class="pk-sidebar-logo"
+                />
+            </a>
+
+            <nav class="pk-sidebar-nav">
+                ${buildNavHTML()}
+            </nav>
+
+            <div class="pk-sidebar-footer">
+
+                <button class="pk-theme-toggle" id="pkThemeToggle" type="button">
+                    <span class="pk-footer-icon">◐</span>
+
+                    <span id="pkThemeLabel">
+                        ${isLight ? "Light mode" : "Dark mode"}
+                    </span>
+
+                    <span class="pk-toggle-track">
+                        <span class="pk-toggle-thumb"></span>
+                    </span>
+                </button>
+
+                <button
+                    class="pk-nav-item pk-logout"
+                    id="pkLogout"
+                    type="button"
+                >
+                    <span class="pk-nav-icon">⎋</span>
+                    <span>Sign out</span>
+                </button>
+
+            </div>
+        </aside>
+    `;
+}
 
     function mount() {
         injectBrandFont();

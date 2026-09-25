@@ -247,3 +247,28 @@ body.has-sidebar {
         padding-top: 70px;
     }
 }
+/* =========================================================
+   PRIMARYKEY SIDEBAR LOGO
+   ========================================================= */
+
+.pk-sidebar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    padding: 18px 16px 22px;
+
+    text-decoration: none;
+}
+
+.pk-sidebar-logo {
+    display: block;
+
+    width: 170px;
+    height: auto;
+
+    max-width: 100%;
+
+    object-fit: contain;
+}
