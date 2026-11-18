@@ -96,7 +96,7 @@
 
         <aside class="pk-sidebar" id="pkSidebar">
 
-            <a href="${ROOT}Dashboard/dashboard.html" class="pk-sidebar-brand">
+            <a href="${ROOT}dashboard/dashboard.html" class="pk-sidebar-brand">
                 <img
                     src="${ROOT}assets/primary-key-logo.svg"
                     alt="PrimaryKey"
